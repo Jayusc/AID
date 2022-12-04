@@ -1,5 +1,13 @@
 version: "3.9"
 services:
+  aid:
+    container_name: aid-container
+    build: .
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongodb
   mongodb:
     hostname: mongodb
     image: mongo:5.0.14
@@ -11,7 +19,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
   mongo-express:
     image: mongo-express
-    restart: always
+    restart: unless-stopped
     ports:
       - 8080:8081
     depends_on:
