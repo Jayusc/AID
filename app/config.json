@@ -1,7 +1,0 @@
-{
-  "host": "mongodb",
-  "port": "27017",
-  "db": "user-account",
-  "user": "admin",
-  "password": "password"
-}
