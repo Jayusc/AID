@@ -1,2 +1,4 @@
 .DS_Store
-config.json
+/app/config.json
+aid-key.pem
+AWS*
