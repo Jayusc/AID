@@ -1,4 +1,4 @@
 .DS_Store
-/app/config.json
+app/config.json
 *.pem
 AWS*
