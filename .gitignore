@@ -2,3 +2,4 @@
 app/config.json
 *.pem
 AWS*
+config
