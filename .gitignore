@@ -1,6 +1,7 @@
 .DS_Store
 app/config.json
 *.pem
-*AWS*
+AWS*
+.aws
 config
 .idea
