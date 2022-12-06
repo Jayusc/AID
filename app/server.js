@@ -21,12 +21,10 @@ const app = express();
     })
     .then((_) => {
       console.log("db connected");
-      // console.log(_);
     })
     .catch((err) => {
       console.error("[db not connected]", err);
     });
-
   // const connection = client.db(env.db);
 
   app.get("/", (req, res) => {

@@ -1,6 +1,9 @@
-# AID
+# Athlete In-depth
 
-To run this app, cd into the repo folder, run
+## Summary and Description
+
+In this project we purpose to build a pure review platform for athletes in every single game, helping readers and strategy makers gain an overview of certain player in one game or the whole career.
+TODO:Write Description here.
 
 ```
 docker-compose down
