@@ -13,6 +13,9 @@ Our project is divided into three phases. In the first phase it’s a web-applic
 
 ## Develop
 
+Front-end Port: 3011
+Back-end Port: 3022
+
 ```
 docker-compose up
 ```
@@ -22,3 +25,5 @@ To commit changes, first stop container.
 ```
 docker-compose down
 ```
+
+If docker-compose file or Dockerfile is modified, delete both images and re-up.
