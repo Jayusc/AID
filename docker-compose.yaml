@@ -33,3 +33,11 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_MONGODB_SERVER=mongodb
     container_name: mongo_express
+
+networks:
+  default:
+    external:
+      name: aid
+
+  aid:
+    external: true
