@@ -11,6 +11,7 @@
             <el-menu-item index="Home">Home</el-menu-item>
             <el-menu-item index="Teams">Teams</el-menu-item>
             <el-menu-item index="Players">Players</el-menu-item>
+            <el-menu-item index="Games">Games</el-menu-item>
         </el-menu>
         <router-view/>
     </div>
@@ -36,6 +37,9 @@ export default {
             if (key === "Players" && this.$route.path !== "/players") {
                 this.$router.push("/players")
             }
+            if (key === "Games" && this.$route.path !== "/games") {
+                this.$router.push("/games")
+            }
         },
     },
     created() {
@@ -48,6 +52,9 @@ export default {
         }
         if (curUrl === "players") {
             this.initialSelect = "Players"
+        }
+        if (curUrl === "games") {
+            this.initialSelect = "Games"
         }
     }
 }

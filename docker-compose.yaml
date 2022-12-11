@@ -10,16 +10,16 @@ services:
       - ./app/backend:/usr/src/app
     depends_on:
       - mongodb
-  vue:
-    container_name: aid-frontend
-    build: ./app/frontend
-    restart: unless-stopped
-    ports:
-      - 3011:8080
-    volumes:
-      - ./app/frontend:/usr/src/app
-    depends_on:
-      - mongodb
+#  vue:
+#    container_name: aid-frontend
+#    build: ./app/frontend
+#    restart: unless-stopped
+#    ports:
+#      - 3011:8080
+#    volumes:
+#      - ./app/frontend:/usr/src/app
+#    depends_on:
+#      - mongodb
   mongodb:
     hostname: mongodb
     image: mongo:5.0.14
