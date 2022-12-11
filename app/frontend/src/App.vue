@@ -5,14 +5,12 @@
 </template>
 
 <script>
-import Home from './components/Home.vue'
 import NavBar from "@/components/NavBar";
 
 export default {
     name: 'App',
     components: {
         NavBar,
-        Home
     }
 }
 </script>

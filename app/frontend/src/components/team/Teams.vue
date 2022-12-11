@@ -11,8 +11,8 @@
 
 <script>
 import axios from "axios";
-import TeamCard from "@/components/TeamCard";
-import TeamDetail from "@/components/TeamDetail";
+import TeamCard from "@/components/team/TeamCard";
+import TeamDetail from "@/components/team/TeamDetail";
 
 export default {
     name: "TeamsPages",
