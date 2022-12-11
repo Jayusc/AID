@@ -1,7 +1,7 @@
 {
   "host": "mongodb",
   "port": "27017",
-  "db": "user-account",
+  "db": "test",
   "user": "admin",
   "password": "password",
   "api_key": "9npp4e85pcp8bv3bshmtpc7v"

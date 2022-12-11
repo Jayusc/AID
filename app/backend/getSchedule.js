@@ -20,13 +20,12 @@ mongoose
 
 const playerSchema = new mongoose.Schema({
   _id: ObjectId,
-  RecentGames: [ObjectId], //of the reviews
-  AverageRating: mongoose.Decimal128,
+  recent_games: [ObjectId], //of the reviews
+  average_rating: mongoose.Decimal128,
   first_name: String,
   last_name: String,
   age: Number,
   team: ObjectId, //of the team
-  versionKey: false,
 });
 
 const reviewSchema = new Schema({
@@ -36,7 +35,6 @@ const reviewSchema = new Schema({
   stats: {},
   ratings: [mongoose.Decimal128],
   comments: [String],
-  versionKey: false,
 });
 
 const userSchema = new Schema({
@@ -46,17 +44,15 @@ const userSchema = new Schema({
   //   follows_team:[ObjectId], // of the team
   username: String,
   password: String,
-  versionKey: false,
 });
 
 const gameSchema = new Schema({
   _id: ObjectId,
-  team_home: ObjectId, //of the team
-  team_away: ObjectId,
-  Outcome: {},
+  team_home: String,
+  team_away: String,
+  outcome: {},
   time: Date,
   players: [ObjectId], //of the player
-  versionKey: false,
 });
 
 const teamSchema = new Schema({
@@ -76,14 +72,28 @@ const [Player, Review, User, Game, Team] = [
 ];
 (async function () {
   const today = new Date();
-  [YYYY, MM, DD] = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
+  [YYYY, MM, DD] = [
+    today.getFullYear(),
+    today.getMonth() + 1,
+    today.getDate() + 1,
+  ];
   GET_SCHE_URL = `https://api.sportradar.com/nba/trial/v7/en/games/${YYYY}/${MM}/${DD}/schedule.json?api_key=9npp4e85pcp8bv3bshmtpc7v`;
   await axios
     .get(GET_SCHE_URL)
-    .then((res) => {
-      const gschedule = res.data;
-      console.log(gschedule);
+    .then(async (res) => {
+      const sched_games = res.data.games;
       // write to database
+      for (const game of sched_games) {
+        await Game.create({
+          _id: ObjectId(),
+          team_home: game.home.alias, //of the team
+          team_away: game.away.alias,
+          Outcome: null,
+          time: YYYY + "-" + MM + "-" + DD,
+          players: [ObjectId], //of the player
+          versionKey: false,
+        });
+      }
     })
     .catch((err) => {
       console.error("[writefile sync]", err);
