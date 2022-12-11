@@ -10,7 +10,7 @@ const {
 const bodyParser = require("body-parser");
 let env, uri, client;
 let players, reviews, users, games;
-
+const { playerAPI, reviewAPI, userAPI, gameAPI } = require("./classAPIs");
 const app = express();
 
 (async function () {
