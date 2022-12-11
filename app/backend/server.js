@@ -37,20 +37,5 @@ const app = express();
     app.listen(port);
 })();
 
-app.post("/games", async (req, res) => {
-    const data = await axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard")
-    let output = {
-        GameID : "",
-        TeamHome: "",
-        TeamAway: "",
-        Outcome: null,
-        Time: null,
-        Players: []
-    }
-    output.GameID = data.data.events[0].id
-    output.TeamHome = data.data.events[0].competitions[0].competitors[0].displayName
-    output.TeamAway = data.data.events[0].competitions[0].competitors[1].displayName
-    output.Outcome = data.data.
 
-})
 
