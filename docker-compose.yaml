@@ -31,6 +31,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
+    # command: bash -c "mongorestore -h=mongodb:27017 -u=admin -p=password --authenticationDatabase=admin /data/db/mongodump-v1/"
   mongo-express:
     image: mongo-express
     restart: unless-stopped
