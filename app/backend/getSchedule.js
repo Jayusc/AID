@@ -1,11 +1,13 @@
 "use strict";
 const port = 3020;
 const path = require("path");
+const axios = require("axios");
 const { readFile } = require("fs/promises");
 const mongoose = require("mongoose");
 const { model, Schema } = require("mongoose");
 const { ObjectId } = require("mongodb");
 const DB = "mongodb://admin:password@mongodb:27017";
+let GET_SCHE_URL, YYYY, MM, DD;
 
 mongoose
   .connect(DB)
@@ -18,13 +20,12 @@ mongoose
 
 const playerSchema = new mongoose.Schema({
   _id: ObjectId,
-  RecentGames: [ObjectId], //of the reviews
-  AverageRating: mongoose.Decimal128,
+  recent_games: [ObjectId], //of the reviews
+  average_rating: mongoose.Decimal128,
   first_name: String,
   last_name: String,
   age: Number,
   team: ObjectId, //of the team
-  versionKey: false,
 });
 
 const reviewSchema = new Schema({
@@ -32,9 +33,8 @@ const reviewSchema = new Schema({
   player: ObjectId, // of the player
   time: Date,
   stats: {},
-  ratings: mongoose.Decimal128,
-  comments: String,
-  versionKey: false,
+  ratings: [mongoose.Decimal128],
+  comments: [String],
 });
 
 const userSchema = new Schema({
@@ -44,17 +44,15 @@ const userSchema = new Schema({
   //   follows_team:[ObjectId], // of the team
   username: String,
   password: String,
-  versionKey: false,
 });
 
 const gameSchema = new Schema({
   _id: ObjectId,
-  team_home: ObjectId, //of the team
-  team_away: ObjectId,
-  Outcome: {},
+  team_home: String,
+  team_away: String,
+  outcome: {},
   time: Date,
   players: [ObjectId], //of the player
-  versionKey: false,
 });
 
 const teamSchema = new Schema({
@@ -72,35 +70,32 @@ const [Player, Review, User, Game, Team] = [
   model("Game", gameSchema),
   model("Team", teamSchema),
 ];
-
-// const teams = JSON.parse(readFileSync("./teams.json")).data;
-
 (async function () {
-  /*   for (const team of teams) {
-    // use mongoose to write to mongodb
-    await Team.create({
-      _id: ObjectId(),
-      abbreviation: team.abbreviation,
-      city: team.city,
-      name: team.name,
+  const today = new Date();
+  [YYYY, MM, DD] = [
+    today.getFullYear(),
+    today.getMonth() + 1,
+    today.getDate() + 1,
+  ];
+  GET_SCHE_URL = `https://api.sportradar.com/nba/trial/v7/en/games/${YYYY}/${MM}/${DD}/schedule.json?api_key=9npp4e85pcp8bv3bshmtpc7v`;
+  await axios
+    .get(GET_SCHE_URL)
+    .then(async (res) => {
+      const sched_games = res.data.games;
+      // write to database
+      for (const game of sched_games) {
+        await Game.create({
+          _id: ObjectId(),
+          team_home: game.home.alias, //of the team
+          team_away: game.away.alias,
+          Outcome: null,
+          time: YYYY + "-" + MM + "-" + DD,
+          players: [ObjectId], //of the player
+          versionKey: false,
+        });
+      }
+    })
+    .catch((err) => {
+      console.error("[writefile sync]", err);
     });
-  } */
-  console.log("before read");
-  const players = JSON.parse(await readFile("./players.json", "utf8"));
-  console.log("after read");
-  console.log(players.length);
-  for (const player of players) {
-    // write to mongodb
-    const teamab = player.team.abbreviation;
-    const tid = await Team.findOne({ abbreviation: teamab })._id;
-    await Player.create({
-      _id: ObjectId(),
-      RecentGames: null,
-      AverageRating: null,
-      first_name: player.first_name,
-      last_name: player.last_name,
-      age: null,
-      team: tid, //of the team
-    });
-  }
 })();
