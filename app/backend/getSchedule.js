@@ -1,11 +1,13 @@
 "use strict";
 const port = 3020;
 const path = require("path");
+const axios = require("axios");
 const { readFile } = require("fs/promises");
 const mongoose = require("mongoose");
 const { model, Schema } = require("mongoose");
 const { ObjectId } = require("mongodb");
 const DB = "mongodb://admin:password@mongodb:27017";
+let GET_SCHE_URL, YYYY, MM, DD;
 
 mongoose
   .connect(DB)
@@ -32,8 +34,8 @@ const reviewSchema = new Schema({
   player: ObjectId, // of the player
   time: Date,
   stats: {},
-  ratings: mongoose.Decimal128,
-  comments: String,
+  ratings: [mongoose.Decimal128],
+  comments: [String],
   versionKey: false,
 });
 
@@ -72,35 +74,18 @@ const [Player, Review, User, Game, Team] = [
   model("Game", gameSchema),
   model("Team", teamSchema),
 ];
-
-// const teams = JSON.parse(readFileSync("./teams.json")).data;
-
 (async function () {
-  /*   for (const team of teams) {
-    // use mongoose to write to mongodb
-    await Team.create({
-      _id: ObjectId(),
-      abbreviation: team.abbreviation,
-      city: team.city,
-      name: team.name,
+  const today = new Date();
+  [YYYY, MM, DD] = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
+  GET_SCHE_URL = `https://api.sportradar.com/nba/trial/v7/en/games/${YYYY}/${MM}/${DD}/schedule.json?api_key=9npp4e85pcp8bv3bshmtpc7v`;
+  await axios
+    .get(GET_SCHE_URL)
+    .then((res) => {
+      const gschedule = res.data;
+      console.log(gschedule);
+      // write to database
+    })
+    .catch((err) => {
+      console.error("[writefile sync]", err);
     });
-  } */
-  console.log("before read");
-  const players = JSON.parse(await readFile("./players.json", "utf8"));
-  console.log("after read");
-  console.log(players.length);
-  for (const player of players) {
-    // write to mongodb
-    const teamab = player.team.abbreviation;
-    const tid = await Team.findOne({ abbreviation: teamab })._id;
-    await Player.create({
-      _id: ObjectId(),
-      RecentGames: null,
-      AverageRating: null,
-      first_name: player.first_name,
-      last_name: player.last_name,
-      age: null,
-      team: tid, //of the team
-    });
-  }
 })();
