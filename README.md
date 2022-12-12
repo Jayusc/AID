@@ -16,7 +16,7 @@ Our project is divided into three phases. In the first phase it’s a web-applic
 ### Data Schema
 
 There are four types of data that consists our whole business logic.
-![dataschema](./datatype.jpg)
+![dataschema](./datatype.png)
 
 ## Develop
 
