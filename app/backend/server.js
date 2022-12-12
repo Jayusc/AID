@@ -13,6 +13,47 @@ let players, reviews, users, games;
 const { playerAPI, reviewAPI, userAPI, gameAPI } = require("./classAPIs");
 const app = express();
 
+const { graphql, buildSchema } = require('graphql');
+const schema = buildSchema(`
+  type Player {
+    playerID: ID!
+    RecentGames: [Review]
+    AverageRating: float
+    Name: String
+    Age: Int
+    Team: String
+    CareerStats: Object
+  }
+ 
+  type Review {
+    player: [Player]
+    reviewID: ID!
+    game: Game
+    Stats: Object
+    Ratings: float
+    Comments: String
+    votes: Int
+    shadow: Boolean
+  }
+
+  type Game {
+    gameID: ID!
+    TeamHome: String
+    TeamAway: String
+    Outcome: Object
+    Time: Date
+    players: [Player]
+  }
+
+  type User {
+    userID: ID!
+    reviews: [Review]
+    follows: [Player]
+    username: String
+    password: String
+  }
+`)
+
 (async function () {
   await readFile(filePath)
     .then((file) => {
