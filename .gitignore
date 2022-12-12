@@ -1,5 +1,8 @@
 .DS_Store
 app/config.json
+app/*/node_modules
 *.pem
 AWS*
+.aws
 config
+.idea
