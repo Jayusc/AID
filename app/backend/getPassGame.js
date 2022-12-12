@@ -1,9 +1,7 @@
 "use strict";
-const port = 3021;
 const path = require("path");
 const axios = require("axios");
 const filePath = path.join(__dirname, "/config.json");
-const express = require("express");
 const { MongoClient, ObjectId, Int32 } = require("mongodb");
 const {
   promises: { readFile },
@@ -13,7 +11,7 @@ let env, uri, client;
 let players, reviews, users, games;
 const timer = require("timers");
 
-const app = express();
+
 class playerAPI {
   constructor() {}
   static async findPlayerbyName(first_name, last_name) {
@@ -264,11 +262,4 @@ class gameAPI {
     }
     console.log(rids); //review IDs
   });
-
-  app.use(bodyParser.json());
-
-  app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-  });
-  app.listen(port);
 })();
