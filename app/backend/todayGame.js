@@ -9,7 +9,6 @@ const {
 const bodyParser = require("body-parser");
 let env, uri, client;
 let players, reviews, users, games;
-const timer = require("timers");
 
 class playerAPI {
   constructor() {}
@@ -493,5 +492,19 @@ class dailyAPI {
     .catch((err) => {
       console.error("[db not connected]", err);
     });
-    // 
+  const today = new Date();
+  const [YYYY, MM, DD] = [
+    today.getFullYear(),
+    today.getMonth() + 1,
+    today.getDate() - 1, //Timezone?
+  ];
+  gameAPI.getSchedule(YYYY, MM, DD, env.api_key).then(async (gameids) => {
+    let rids = [];
+    for (const game_id of gameids) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      //   await sleep(1000);
+      rids.push(await gameAPI.postGame(game_id, env.api_key));
+    }
+    console.log(rids); //review IDs
+  });
 })();

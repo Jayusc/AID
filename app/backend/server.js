@@ -421,7 +421,7 @@ class dailyAPI {
     this.GameOutcomes24hour();
   }
 
-  GameSchedules() {
+  GameSchedules = () => {
     // Get today's game schedules
     gameAPI
       .getSchedule(this.YYYY, this.MM, this.DD, env.api_key)
@@ -433,35 +433,36 @@ class dailyAPI {
       .catch((err) => {
         console.error("[GameSchedules]", err);
       });
-  }
-  GameSchedules24hour() {
+  };
+  GameSchedules24hour = () => {
     let initialExecutionTime = new Date();
     initialExecutionTime.setHours(4);
     initialExecutionTime.setMinutes(0);
     initialExecutionTime.setSeconds(0);
     this.GameSchedules();
     setTimeout(function () {
+      // FIXME: the scope problem, callee deprecated
       // execute this at 4:00 AM everyday
       this.GameSchedules();
       // repeat every 24 hour
       setInterval(this.GameSchedules(), 24 * 60 * 60 * 1000);
     }, initialExecutionTime - Date.now());
-  }
+  };
 
-  async GameOutcomes() {
+  GameOutcomes = async () => {
     if (this.game_stack) {
       // update game outcomes
       while (this.game_stack) {
-        game_id = this.game_stack.pop();
+        const game_id = this.game_stack.pop();
         await new Promise((resolve) => setTimeout(resolve, 1000));
         this.postgame_reviews.push(
           await gameAPI.postGame(game_id, env.api_key)
         );
       }
     }
-  }
+  };
 
-  GameOutcomes24hour() {
+  GameOutcomes24hour = () => {
     let initialExecutionTime = new Date();
     initialExecutionTime.setHours(22);
     initialExecutionTime.setMinutes(0);
@@ -473,7 +474,7 @@ class dailyAPI {
       // repeat every 24 hour
       setInterval(this.GameOutcomes(), 24 * 60 * 60 * 1000);
     }, initialExecutionTime - Date.now());
-  }
+  };
 }
 
 (async function () {
@@ -494,8 +495,8 @@ class dailyAPI {
     .catch((err) => {
       console.error("[db not connected]", err);
     });
-  const dailyGames = new dailyAPI(new Date());
-  /*   let newgames_unplayed = dailyGames.game_stack;
+  /*   const dailyGames = new dailyAPI(new Date());
+    let newgames_unplayed = dailyGames.game_stack;
   let postgame_reviews = dailyGames.postgame_reviews;
   app.use(bodyParser.json()); */
 
