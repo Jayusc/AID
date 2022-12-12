@@ -1,4 +1,4 @@
-# ee547-project
+# ee-547-front
 
 ## Project setup
 ```

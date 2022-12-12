@@ -1,2 +1,5 @@
 *
 !.gitignore
+!/mongodump*
+!/mongodump*/*
+!/mongodump*/*/*
