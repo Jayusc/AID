@@ -1,9 +1,7 @@
 "use strict";
-const port = 3020;
 const path = require("path");
 const axios = require("axios");
 const filePath = path.join(__dirname, "/config.json");
-const express = require("express");
 const { MongoClient, ObjectId, Int32 } = require("mongodb");
 const {
   promises: { readFile },
@@ -11,7 +9,8 @@ const {
 const bodyParser = require("body-parser");
 let env, uri, client;
 let players, reviews, users, games;
-const app = express();
+const timer = require("timers");
+
 class playerAPI {
   constructor() {}
   static async getPlayerbyId(pid) {
@@ -494,13 +493,5 @@ class dailyAPI {
     .catch((err) => {
       console.error("[db not connected]", err);
     });
-  const dailyGames = new dailyAPI(new Date());
-  /*   let newgames_unplayed = dailyGames.game_stack;
-  let postgame_reviews = dailyGames.postgame_reviews;
-  app.use(bodyParser.json()); */
-
-  app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-  });
-  app.listen(port);
+    // 
 })();
