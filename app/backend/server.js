@@ -621,17 +621,11 @@ async function loadUsers(db, keys) {
 
 async function loadGames(db, keys) {
   const games = await db.collection("games").find().toArray();
-  let index = 0;
   const result = games.reduce((acc, document) => {
     // console.log(index++, typeof document, typeof document._id, typeof acc);
     acc[document._id.toString()] = document;
     return acc;
   }, {});
-  /*   for (const key of keys) {
-    console.log(++index);
-    console.log("key is: ", key);
-    console.log("result[key] is: ", result[key]);
-  } */
   return keys.map(
     (key) => result[key] || new Error(`game [${key}] does not exist `)
   );

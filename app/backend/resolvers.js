@@ -6,7 +6,11 @@ const resolvers = {
       return _id;
     },
     recent_reviews: ({ _id }, _, context) => {
-      return context.playerAPI.getRecentRevs(context.db, _id);
+      return context.playerAPI.getRecentRevs(context.db, _id).then((rids) => {
+        return rids.map((rid) =>
+          context.reviewAPI.getReviewById(context.db, rid)
+        );
+      });
     },
     average_rating: ({ _id }, _, context) => {
       return context.playerAPI.getPlayerRating(context.db, _id);
@@ -67,8 +71,14 @@ const resolvers = {
     time: ({ _id }, _, context) => {
       return context.gameAPI.getTime(context.db, _id);
     },
-    players: ({ _id }, _, context) => {
-      return context.gameAPI.getGamePlayers(context.db, _id);
+    players: async ({ _id }, _, context) => {
+      let players = [];
+      const playerIds = await context.gameAPI.getGamePlayers(context.db, _id);
+      for (const playerId of playerIds)
+        players.push(
+          await context.playerAPI.getPlayerbyId(context.db, playerId)
+        );
+      return players;
     },
   },
   User: {
