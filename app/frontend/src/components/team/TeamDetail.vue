@@ -7,8 +7,22 @@
                 </div>
             </el-card>
         <el-card class="marginBottom" shadow="hover">
-            <div v-for = "(o,i) in alldata.record.items" key = "i">
+            <div v-for = "(o,i) in alldata.record.items" :key = "i">
+                <el-col>
+                    <el-row>
+                        <el-card>
+                            {{o.description}}
+                            <div v-for = "(p,q) in o.stats" :key = "q">
+                                <el-card>
+                                    {{p.name}} {{p.value}}
+                                </el-card>
+                            </div>
+                        </el-card>
+                    </el-row>
+                </el-col>
+                <div>
 
+                </div>
             </div>
         </el-card>
 <!--        </el-col>-->
