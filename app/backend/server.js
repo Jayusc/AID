@@ -152,6 +152,7 @@ class reviewAPI {
       .toArray();
   }
   static async belongPlayer(db, rid) {
+    // return playerID of the review
     return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.player : null;
     });
