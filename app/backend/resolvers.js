@@ -193,7 +193,13 @@ const resolvers = {
     },
     changePassword: async (_, {uid, new_password}, context) => {
       return context.userAPI.changePwd(context.db, uid, new_password);
-    }
+    },
+    upVote: async (_, {rid}, context) => {
+      return context.reviewAPI.upVote(context.db, rid)
+    },
+    downVote: async (_, {rid}, context) => {
+      return context.reviewAPI.downVote(context.db, rid)
+    },
   },
 };
 

@@ -182,10 +182,38 @@ class reviewAPI {
     });
   }
   static async upVote(db, rid) {
-    // upvote this
+    // upvote this review
+    const reviews = db.collection("reviews");
+    const previous_votes = await reviewAPI.getVotes(db, rid);
+    return await reviews
+      .updateOne(
+        {
+          _id: ObjectId(rid),
+        },
+        {
+          votes: previous_votes + 1,
+        }
+      )
+      .then((_) => {
+        return previous_votes + 1;
+      });
   }
   static async downVote(db, rid) {
-    // downvote this
+    // downvote this review
+    const reviews = db.collection("reviews");
+    const previous_votes = await reviewAPI.getVotes(db, rid);
+    return await reviews
+      .updateOne(
+        {
+          _id: ObjectId(rid),
+        },
+        {
+          votes: previous_votes - 1,
+        }
+      )
+      .then((_) => {
+        return previous_votes - 1;
+      });
   }
   static async isShadow(db, rid) {
     return await reviewAPI.getReviewById(db, rid).then((review) => {
