@@ -7,6 +7,12 @@ const express = require("express");
 const { MongoClient, ObjectId, Int32 } = require("mongodb");
 const { graphqlHTTP } = require("express-graphql");
 const DataLoader = require("dataloader");
+const cors = require('cors');
+const app = express();
+// 处理跨域请求
+app.use(cors());
+app.use(express.json());//express.json=bodyParser.json
+app.use(express.urlencoded({ extended: true }));
 const {
   readFileSync,
   promises: { readFile },
@@ -17,7 +23,7 @@ const {
   makeExecutableSchema,
 } = require("@graphql-tools/schema");
 let env, uri, client;
-const app = express();
+
 class playerAPI {
   constructor() {}
   static async getPlayerbyId(db, pid) {

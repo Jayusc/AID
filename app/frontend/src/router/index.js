@@ -2,7 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from "@/components/home/Home";
 import Teams from "@/components/team/Teams";
-import Players from "@/components/player/Players";
+import ProfilePage from "@/components/ProfilePage";
+// import Players from "@/components/player/Players";
+// import Games from "@/components/Games/Games";
+// import LoginPage from "@/components/LoginPage";
 
 Vue.use(VueRouter)
 
@@ -30,9 +33,9 @@ const routes = [
         component: Teams,
     },
     {
-        path: '/players',
-        name: 'players',
-        component: Players,
+        path: '/profile',
+        name: 'profile',
+        component: ProfilePage,
     },
 ]
 

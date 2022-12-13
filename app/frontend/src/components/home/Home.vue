@@ -1,27 +1,122 @@
 <template>
     <el-card>
-        <img alt="Vue logo"
-             src="https://cdn.vox-cdn.com/thumbor/WCvT8BMeNRsW95tQZzp6mQHocuA=/0x0:1200x800/920x613/filters:focal(506x210:698x402):format(webp)/cdn.vox-cdn.com/uploads/chorus_image/image/65460511/kristaps_luka_getty_ringer_2.0.jpg">
-        <div v-for="(o, i) in allMatchesInfo" :key="i">
-            <el-row>
-                <el-col>
-                    <el-card class="box-card" shadow="hover">
-                        {{ o.shortName }}
-                    </el-card>
-                </el-col>
-            </el-row>
+        <div v-if="showHome">
+            <div class="bc"></div>
+            <div class="left">
+                <div v-for="(o, i) in gid" :key="i" @click="() => selectFunc(i)">
+                    <el-row>
+                        <el-col>
+                            <el-card class="box-card marginBottom" shadow="hover">
+                                <div>
+                                    {{ o.time }}
+
+                                </div>
+                                <div>
+                                    {{TeamAbbtoFull1[o.team_Home]
+                                    }} VS
+                                    {{ TeamAbbtoFull1[o.team_Away] }}
+
+                                </div>
+                                <div class = "HomePage">
+                                    {{games}}
+                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                                    <!--                                        o.competitions[0].competitors[0].score-->
+                                    <!--                                    }}-->
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+
+
+            <div class="middle">
+                <div v-for="(o, i) in allMatchesInfo" :key="i" @click="() => selectFunc(i)">
+                    <el-row>
+                        <el-col>
+                            <el-card class="box-card marginBottom" shadow="hover">
+                                <div>
+                                    {{ o.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].team.name }} VS
+                                    {{ o.competitions[0].competitors[0].team.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].score }} : {{
+                                        o.competitions[0].competitors[0].score
+                                    }}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+
+
+            <div class="right">
+                <div v-for="(o, i) in allMatchesInfo" :key="i" @click="() => selectFunc(i)">
+                    <el-row>
+                        <el-col>
+                            <el-card class="box-card marginBottom" shadow="hover">
+                                <div>
+                                    {{ o.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].team.name }} VS
+                                    {{ o.competitions[0].competitors[0].team.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].score }} : {{
+                                        o.competitions[0].competitors[0].score
+                                    }}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+        </div>
+
+
+        <div v-if="showGameDeatil">
+            <GameDetail :return-home="returnHome"/>
         </div>
     </el-card>
 </template>
 
 <script>
+import gql from "graphql-tag"
 import axios from "axios";
+import GameDetail from "@/components/Games/GameDetail";
+// import TeamAbbtoFull from "@/components/TeamCorresponding"
+import {TeamAbbtoFull} from "./TeamCorresponding";
+
+// const query = `query($date:String) {
+//       games(date: $date) {
+//         pid
+//         time
+//         team_Home
+//         team_Away
+//       }
+//     }`;
+// const variables = {
+//     date: "2022-12-12"
+// };
 
 export default {
     name: 'HomePage',
+    components: {GameDetail},
     data() {
         return {
-            allMatchesInfo: []
+            allMatchesInfo: [],
+            gameInfo: {},
+            showGameDeatil: false,
+            showHome: true,
+            gid: [],
+            // games: [],
+            outcome: [],
+            TeamAbbtoFull1: TeamAbbtoFull,
         }
     },
 
@@ -30,16 +125,97 @@ export default {
             axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
                 this.allMatchesInfo = r.data.events
             })
-        }
+        },
+
+        selectFunc(id) {
+            console.log(id)
+            // axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
+            //     this.gameInfo = r.data.xxxxx
+            // })
+            this.showHome = false
+            this.showGameDeatil = true
+        },
+
+        returnHome() {
+            this.showHome = true
+            this.showGameDeatil = false
+        },
     },
 
     created() {
         this.getMatchesInfo()
-    }
+    },
+    apollo: {
+        // 带参数的查询
+        gid: {
+            // gql 查询
+            query: gql`query Query($date: String) {
+                games(date: $date){
+                time
+                team_Home
+                team_Away
+                gid
+                }
+            }`,
+            update(data) {
+                // console.log(this.games)
+                return data.games;
+
+            },
+            // 静态参数
+            variables: {
+                date: '2022-12-11',
+            },
+            // fetchPolicy: "no-cors"
+            // no-core
+        },
+        games: gql`query Query($date: String) {
+            games(date: $date){
+
+            }
+        }`
+    },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.bc {
+    width: 920px;
+    height: 613px;
+    background: url("../kristaps_luka_getty_ringer_2.0.png");
+    margin: 0 auto;
+}
 
+.marginBottom {
+    margin-bottom: 10px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.main {
+    width: 800px;
+    margin: 0 auto;
+}
+
+.left {
+    width: 33.33%;
+    background: white;
+    float: left;
+}
+
+.middle {
+    width: 33.33%;
+    background: white;
+    float: left;
+}
+
+.right {
+    width: 33.33%;
+    background: white;
+    float: right;
+}
 </style>
