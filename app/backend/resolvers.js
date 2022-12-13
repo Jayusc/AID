@@ -172,10 +172,17 @@ const resolvers = {
   Mutation: {
     writeReview: async (_, {pid, gid, uid, new_comment, new_rating}, context) => {
       const shadow_review_id = await context.reviewAPI.getShadow(context.db, pid, gid);
-      return context.reviewAPI.newReview(context.db, pid, gid, uid, shadow_review_id, new_comment, new_rating)
+      return context.reviewAPI.newReview(context.db, pid, gid, uid, shadow_review_id, new_comment, new_rating);
     },
     createUser: async (_, {username, password}, context) => {
-      return context.userAPI.createUser(context.db, username, password)
+      return context.userAPI.createUser(context.db, username, password);
+    },
+    follow: async (_, {pid, uid}, context) => {
+      return await context.userAPI
+        .startFollow(context.db, pid, uid)
+        .then((idList) => {
+          return idList.map((id) => context.loaders.player.load(id));
+        })
     }
   },
 };

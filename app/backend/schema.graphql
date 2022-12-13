@@ -68,4 +68,6 @@ type Mutation {
   writeReview(pid: ID!, gid: ID!, uid: ID!, new_comment: String, new_rating: Float): Review
 
   createUser(username: String!, password: String!): ID!
+
+  follow(pid: ID!, uid: id!): [Player]
 }

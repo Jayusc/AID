@@ -288,6 +288,7 @@ class userAPI {
     });
   }
   static async createUser(db, username, password) {
+    // create a new user
     const users = db.collection("users");
     return await users
       .insertOne({
@@ -318,8 +319,26 @@ class userAPI {
         return rid;
       });
   }
-  static async startFollow() {
+  static async startFollow(db, pid, uid) {
     // TODO:user start to follow a player
+    const users = db.collection("users");
+    return await users
+      .updateOne(
+        {
+          _id: ObjectId(uid),
+        },
+        {
+          $push: {
+            follows: pid,
+          },
+        }
+      )
+      .then((_) => {
+        return playerAPI.getPlayerbyId(db, pid)
+      })
+      .then((player) => {
+        return player.follows;
+      });
   }
   static async unFollow() {
     // TODO:user stop follow one player
