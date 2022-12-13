@@ -1,24 +1,90 @@
 <template>
-  <el-card>
-    <div v-if="showHome">
-      <div class="bc" @click="shuaxin"></div>
-      <div class="left">
-        <div v-for="(o, i) in gid" :key="i" @click="() => selectFunc(i)">
-          <el-row>
-            <el-col>
-              <el-card class="box-card marginBottom" shadow="hover">
-                <div>
-                  {{ o.time }}
+    <el-card>
+        <div v-if="showHome">
+            <div class="bc" @click="shuaxin"></div>
+            <div class="left">
+                <div v-for="(o, i) in gid" :key="i" @click="() => selectFunc(i)">
+                    <el-row >
+                        <el-col >
+                            <el-card class="box-card marginBottom" shadow="hover" width = "40px">
+                                <div>
+                                    {{ o.time }}
+
+                                </div>
+                                <div>
+                                    {{
+                                        TeamAbbtoFull1[o.team_Home]
+                                    }} VS
+                                    {{ TeamAbbtoFull1[o.team_Away] }}
+
+                                </div>
+                                <div class="HomePage">
+                                    {{ o.outcome.home  }} : {{o.outcome.away}}
+                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                                    <!--                                        o.competitions[0].competitors[0].score-->
+                                    <!--                                    }}-->
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
                 </div>
-                <div>
-                  {{ TeamAbbtoFull1[o.team_Home] }} VS
-                  {{ TeamAbbtoFull1[o.team_Away] }}
+            </div>
+
+
+            <div class="middle">
+                <div v-for="(o, i) in time" :key="i" @click="() => selectFunc(i)">
+                    <el-row>
+                        <el-col>
+                            <el-card class="box-card marginBottom" shadow="hover">
+                                <div>
+                                    {{ o.time }}
+                                </div>
+                                <div>
+                                    <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
+                                    <!--                                    {{ o.competitions[0].competitors[0].team.name }}-->
+                                    {{
+                                        TeamAbbtoFull1[o.team_Home]
+                                    }} VS
+                                    {{ TeamAbbtoFull1[o.team_Away] }}
+                                </div>
+                                <div>
+                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                                    <!--                                        o.competitions[0].competitors[0].score }}-->
+                                    {{ o.outcome.home  }} : {{o.outcome.away}}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
                 </div>
-                <div class="HomePage">
-                  {{ time }}
-                  <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
-                  <!--                                        o.competitions[0].competitors[0].score-->
-                  <!--                                    }}-->
+            </div>
+
+
+            <div class="right">
+                <div v-for="(o, i) in team_Away" :key="i" @click="() => selectFunc(i)">
+                    <el-row>
+                        <el-col>
+                            <el-card class="box-card marginBottom" shadow="hover">
+                                <div>
+                                    <!--                                    {{ o.name }}-->
+                                    {{ o.time }}
+                                </div>
+                                <div>
+                                    {{
+                                        TeamAbbtoFull1[o.team_Home]
+                                    }} VS
+                                    {{ TeamAbbtoFull1[o.team_Away] }}
+                                    <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
+                                    <!--                                    {{ o.competitions[0].competitors[0].team.name }}-->
+                                </div>
+                                <div>
+                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                                    <!--                                        o.competitions[0].competitors[0].score-->
+                                    <!--                                    }}-->
+                                    {{ "Coming next" }}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
                 </div>
               </el-card>
             </el-col>
@@ -111,40 +177,44 @@ import { TeamAbbtoFull } from "./TeamCorresponding";
 // };
 
 export default {
-  name: "HomePage",
-  components: { GameDetail },
-  data() {
-    return {
-      allMatchesInfo: [],
-      gameInfo: {},
-      showGameDeatil: false,
-      showHome: true,
-      gid: [],
-      games: [],
-      outcome: null,
-      TeamAbbtoFull1: TeamAbbtoFull,
-      time: [],
-    };
-  },
-
-  methods: {
-    getMatchesInfo() {
-      axios
-        .get(
-          "http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
-        )
-        .then((r) => {
-          this.allMatchesInfo = r.data.events;
-        });
+    name: 'HomePage',
+    components: {GameDetail},
+    data() {
+        return {
+            allMatchesInfo: [],
+            gameInfo: {},
+            showGameDeatil: false,
+            showHome: true,
+            gid: [],
+            TeamAbbtoFull1: TeamAbbtoFull,
+            time: [],
+            team_Away: [],
+        }
     },
 
-    selectFunc(id) {
-      console.log(id);
-      // axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
-      //     this.gameInfo = r.data.xxxxx
-      // })
-      this.showHome = false;
-      this.showGameDeatil = true;
+    methods: {
+        getMatchesInfo() {
+            axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
+                this.allMatchesInfo = r.data.events
+            })
+        },
+
+        selectFunc(id) {
+            console.log(id)
+            // axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
+            //     this.gameInfo = r.data.xxxxx
+            // })
+            this.showHome = false
+            this.showGameDeatil = true
+        },
+
+        returnHome() {
+            this.showHome = true
+            this.showGameDeatil = false
+        },
+        shuaxin() {
+            console.log(this.time)
+        }
     },
 
     returnHome() {
@@ -154,60 +224,92 @@ export default {
     shuaxin() {
       console.log(this.games);
     },
-  },
-
-  created() {
-    this.getMatchesInfo();
-  },
-  apollo: {
-    // 带参数的查询
-    gid: {
-      // gql 查询
-      query: gql`
-        query Query($date: String) {
-          games(date: $date) {
-            time
-            team_Home
-            team_Away
-            gid
-            outcome{
+    apollo: {
+        // 带参数的查询
+        gid: {
+            // gql 查询
+            query: gql`query Query($date: String) {
+                games(date: $date){
+                time
+                team_Home
+                team_Away
+                gid
+                outcome{
                 home
                 away
-            }
-          }
-        }
-      `,
-      update(data) {
-        // console.log(this.games)
-        return data.games;
-      },
-      // 静态参数
-      variables: {
-        date: "2022-12-12",
-      },
-      // fetchPolicy: "no-cors"
-      // no-core
-    },
+                }
+                }
+            }`,
+            update(data) {
+                // console.log(this.games)
+                return data.games;
 
-    time: {
-      // gql 查询
-      query: gql`
-        query Query($date: String) {
-          games(date: $date) {
-            time
-          }
-        }
-      `,
-      update(data) {
-        // console.log(this.games)
-        return data.games;
-      },
-      // 静态参数
-      variables: {
-        date: "2022-12-12",
-      },
-      // fetchPolicy: "no-cors"
-      // no-core
+            },
+            // 静态参数
+            variables: {
+                date: '2022-12-10',
+            },
+            // fetchPolicy: "no-cors"
+            // no-core
+        },
+        time: {
+            // gql 查询
+            query: gql`query Query($date: String) {
+                games(date: $date){
+                time
+                team_Home
+                team_Away
+                gid
+                outcome{
+                home
+                away
+                }
+                players{
+                pid
+                name
+                }
+
+                }
+            }`,
+            update(data) {
+                console.log(data.games)
+                return data.games;
+
+            },
+            // 静态参数
+            variables: {
+                date: '2022-12-11',
+            },
+            // fetchPolicy: "no-cors"
+            // no-core
+        },
+
+        team_Away: {
+            // gql 查询
+            query: gql`query Query($date: String) {
+                games(date: $date){
+                time
+                team_Home
+                team_Away
+                gid
+                outcome{
+                home
+                away
+                }
+                }
+            }`,
+            update(data) {
+                // console.log(this.games)
+                return data.games;
+
+            },
+            // 静态参数
+            variables: {
+                date: '2022-12-12',
+            },
+            // fetchPolicy: "no-cors"
+            // no-core
+        },
     },
   },
 };
