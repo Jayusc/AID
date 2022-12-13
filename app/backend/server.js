@@ -5,16 +5,23 @@ const axios = require("axios");
 const filePath = path.join(__dirname, "/config.json");
 const express = require("express");
 const { MongoClient, ObjectId, Int32 } = require("mongodb");
+const { graphqlHTTP } = require("express-graphql");
+const DataLoader = require("dataloader");
 const {
+  readFileSync,
   promises: { readFile },
 } = require("fs");
 const bodyParser = require("body-parser");
+const {
+  assertResolversPresent,
+  makeExecutableSchema,
+} = require("@graphql-tools/schema");
 let env, uri, client;
-let players, reviews, users, games;
 const app = express();
 class playerAPI {
   constructor() {}
-  static async getPlayerbyId(pid) {
+  static async getPlayerbyId(db, pid) {
+    const players = db.collection("players");
     return await players
       .findOne({
         _id: ObjectId(pid),
@@ -29,29 +36,38 @@ class playerAPI {
       });
   }
 
-  static async getRecentRevs(pid) {
-    return await playerAPI.getPlayerbyId(pid).then((player) => {
+  static async getAllPlayers(db) {
+    return await db
+      .collection("players")
+      .find()
+      .map((p) => p._id)
+      .toArray();
+  }
+
+  static async getRecentRevs(db, pid) {
+    return await playerAPI.getPlayerbyId(db, pid).then((player) => {
       return player ? player.recent_revs : null;
     });
   }
-  static async getPlayerRating(pid) {
-    return await playerAPI.getPlayerbyId(pid).then((player) => {
+  static async getPlayerRating(db, pid) {
+    return await playerAPI.getPlayerbyId(db, pid).then((player) => {
       return player ? player.ave_rating : null;
     });
   }
 
-  static async PlayerfName(pid) {
-    return await playerAPI.getPlayerbyId(pid).then((player) => {
+  static async PlayerfName(db, pid) {
+    return await playerAPI.getPlayerbyId(db, pid).then((player) => {
       return player ? player.first_name : null;
     });
   }
-  static async PlayerlName(pid) {
-    return await playerAPI.getPlayerbyId(pid).then((player) => {
+  static async PlayerlName(db, pid) {
+    return await playerAPI.getPlayerbyId(db, pid).then((player) => {
       return player ? player.last_name : null;
     });
   }
-  static async findPlayerbyName(first_name, last_name) {
+  static async findPlayerbyName(db, first_name, last_name) {
     // return player ID
+    const players = db.collection("players");
     return await players
       .findOne({
         first_name: first_name,
@@ -70,8 +86,9 @@ class playerAPI {
       });
   }
 
-  static async updateRating(pid, rating) {
+  static async updateRating(db, pid, rating) {
     // update rating from user
+    const players = db.collection("players");
     return await players.updateOne(
       {
         _id: ObjectId(pid),
@@ -84,8 +101,9 @@ class playerAPI {
     );
   }
 
-  static async appendReview(pid, rid) {
+  static async appendReview(db, pid, rid) {
     // append new game review to this player, return review id
+    const players = db.collection("players");
     return await players
       .updateOne(
         {
@@ -102,18 +120,17 @@ class playerAPI {
       });
   }
 
-  static async getRecentReviews(pid) {
-    return await playerAPI.getPlayerbyId(pid).then((player) => {
-      if (player) {
-        const rids = player.recent_revs;
-      }
+  static async getRecentReviews(db, pid) {
+    return await playerAPI.getPlayerbyId(db, pid).then((player) => {
+      return player ? player.recent_revs : null;
     });
   }
 }
 
 class reviewAPI {
   constructor() {}
-  static async getReviewById(rid) {
+  static async getReviewById(db, rid) {
+    const reviews = db.collection("reviews");
     return await reviews
       .findOne({
         _id: ObjectId(rid),
@@ -127,45 +144,59 @@ class reviewAPI {
         }
       });
   }
-  static async belongGame(rid) {
-    return await reviewAPI.getReviewById(rid).then((review) => {
+  static async getAllReviews(db) {
+    return await db
+      .collection("reviews")
+      .find()
+      .map((p) => p._id)
+      .toArray();
+  }
+  static async belongPlayer(db, rid) {
+    // return playerID of the review
+    return await reviewAPI.getReviewById(db, rid).then((review) => {
+      return review ? review.player : null;
+    });
+  }
+  static async belongGame(db, rid) {
+    return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.game : null;
     });
   }
-  static async gameStats(rid) {
-    return await reviewAPI.getReviewById(rid).then((review) => {
+  static async playerStats(db, rid) {
+    return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.stats : null;
     });
   }
-  static async getRating(rid) {
-    return await reviewAPI.getReviewById(rid).then((review) => {
+  static async getRating(db, rid) {
+    return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.rating : null;
     });
   }
-  static async getComment(rid) {
-    return await reviewAPI.getReviewById(rid).then((review) => {
+  static async getComment(db, rid) {
+    return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.comment : null;
     });
   }
-  static async getVotes(rid) {
-    return await reviewAPI.getReviewById(rid).then((review) => {
+  static async getVotes(db, rid) {
+    return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.votes : null;
     });
   }
-  static async upVote(rid) {
+  static async upVote(db, rid) {
     // upvote this
   }
-  static async downVote(rid) {
+  static async downVote(db, rid) {
     // downvote this
   }
-  static async isShadow(rid) {
-    return await reviewAPI.getReviewById(rid).then((review) => {
+  static async isShadow(db, rid) {
+    return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.shadow : null;
     });
   }
 
-  static async ShadowReview(pid, gid, playerstats) {
+  static async ShadowReview(db, pid, gid, playerstats) {
     // create a shadow review with no rating and comments. return review ID
+    const reviews = db.collection("reviews");
     return await reviews
       .insertOne({
         _id: ObjectId(),
@@ -179,7 +210,7 @@ class reviewAPI {
       })
       .then((created) => {
         const rid = created.insertedId;
-        playerAPI.appendReview(pid, rid);
+        playerAPI.appendReview(db, pid, rid);
         return rid;
       });
     // when the game is locked, replace shadow review
@@ -188,8 +219,9 @@ class reviewAPI {
 
 class userAPI {
   constructor() {}
-  static async getUserById(uid) {
-    return await users
+  static async getUserById(db, uid) {
+    return await db
+      .collection("users")
       .findOne({
         _id: ObjectId(uid),
       })
@@ -202,23 +234,30 @@ class userAPI {
         }
       });
   }
-  static async userReviews(uid) {
-    return await userAPI.getUserById(uid).then((user) => {
+  static async getAllUsers(db) {
+    return await db
+      .collection("users")
+      .find()
+      .map((p) => p._id)
+      .toArray();
+  }
+  static async userReviews(db, uid) {
+    return await userAPI.getUserById(db, uid).then((user) => {
       return user ? user.reviews : null;
     });
   }
-  static async userFollows(uid) {
-    return await userAPI.getUserById(uid).then((user) => {
+  static async userFollows(db, uid) {
+    return await userAPI.getUserById(db, uid).then((user) => {
       return user ? user.follows : null;
     });
   }
-  static async userName(uid) {
-    return await userAPI.getUserById(uid).then((user) => {
+  static async userName(db, uid) {
+    return await userAPI.getUserById(db, uid).then((user) => {
       return user ? user.username : null;
     });
   }
-  static async userPassword(uid) {
-    return await userAPI.getUserById(uid).then((user) => {
+  static async userPassword(db, uid) {
+    return await userAPI.getUserById(db, uid).then((user) => {
       return user ? user.password : null;
     });
   }
@@ -241,8 +280,9 @@ class userAPI {
 
 class gameAPI {
   constructor() {}
-  static async getGameById(gid) {
-    return await games
+  static async getGameById(db, gid) {
+    return await db
+      .collection("games")
       .findOne({
         _id: ObjectId(gid),
       })
@@ -255,32 +295,46 @@ class gameAPI {
         }
       });
   }
-  static async getHome(gid) {
-    return await gameAPI.getGameById(gid).then((game) => {
+  static async getAllGames(db) {
+    return await db
+      .collection("games")
+      .find()
+      .map((p) => p._id)
+      .toArray();
+  }
+  static async getGamebyDate(db, date) {
+    return await db
+      .collection("games")
+      .find({ time: date })
+      .map((p) => p._id)
+      .toArray();
+  }
+  static async getHome(db, gid) {
+    return await gameAPI.getGameById(db, gid).then((game) => {
       return game ? game.team_home : null;
     });
   }
-  static async getAway(gid) {
-    return await gameAPI.getGameById(gid).then((game) => {
+  static async getAway(db, gid) {
+    return await gameAPI.getGameById(db, gid).then((game) => {
       return game ? game.team_away : null;
     });
   }
-  static async getOutcome(gid) {
-    return await gameAPI.getGameById(gid).then((game) => {
+  static async getOutcome(db, gid) {
+    return await gameAPI.getGameById(db, gid).then((game) => {
       return game ? game.outcome : null;
     });
   }
-  static async getTime(gid) {
-    return await gameAPI.getGameById(gid).then((game) => {
+  static async getTime(db, gid) {
+    return await gameAPI.getGameById(db, gid).then((game) => {
       return game ? game.time : null;
     });
   }
-  static async getGamePlayers(gid) {
-    return await gameAPI.getGameById(gid).then((game) => {
+  static async getGamePlayers(db, gid) {
+    return await gameAPI.getGameById(db, gid).then((game) => {
       return game ? game.players : null;
     });
   }
-  static async getSchedule(YYYY, MM, DD, KEY) {
+  static async getSchedule(db, YYYY, MM, DD, KEY) {
     // Get game schedule from API,return a list of game IDs
     const GET_SCHE_URL = `https://api.sportradar.com/nba/trial/v7/en/games/${YYYY}/${MM}/${DD}/schedule.json?api_key=${KEY}`;
     const res = await axios.get(GET_SCHE_URL).then(async (res) => {
@@ -289,7 +343,8 @@ class gameAPI {
       let gids = [];
       for (const game of sched_games) {
         gids.push(
-          await games
+          await db
+            .collection("games")
             .insertOne({
               _id: ObjectId(),
               third_id: game.id, //third party API's game id
@@ -310,11 +365,9 @@ class gameAPI {
     });
     return res;
   }
-  static async postGame(gid, KEY) {
+  static async postGame(db, gid, KEY) {
     // update database, return a list of reviews(ID) or 404
-    const game = await games.findOne({
-      _id: ObjectId(gid),
-    });
+    const game = await gameAPI.getGameById(db, gid);
     // get game info to update game outcome
     const POST_GAME_URL = `https://api.sportradar.com/nba/trial/v7/en/games/${game.third_id}/summary.json?api_key=${KEY}`;
     return await axios
@@ -336,10 +389,10 @@ class gameAPI {
           if (player.not_playing_reason) continue;
           rids.push(
             await playerAPI
-              .findPlayerbyName(player.first_name, player.last_name)
+              .findPlayerbyName(db, player.first_name, player.last_name)
               .then((pid) => {
                 if (pid) {
-                  gameAPI.fillGamePlayer(gid, pid);
+                  gameAPI.fillGamePlayer(db, gid, pid);
                   // create a shadow review
                   const stats = player.statistics;
                   const playerstats = {
@@ -351,7 +404,7 @@ class gameAPI {
                     blocks: stats.blocks,
                     turnovers: stats.turnovers,
                   };
-                  return reviewAPI.ShadowReview(pid, gid, playerstats);
+                  return reviewAPI.ShadowReview(db, pid, gid, playerstats);
                 } else {
                   // don't create review for no ppl
                   return "Player 404";
@@ -371,9 +424,10 @@ class gameAPI {
         console.error("[should return a list of reviews]", err);
       });
   }
-  static async updateGameOutcome(gid, h_pts, a_pts) {
+  static async updateGameOutcome(db, gid, h_pts, a_pts) {
     // update game scores, return game ID
-    games
+    return await db
+      .collection("games")
       .updateOne(
         {
           _id: gid,
@@ -391,9 +445,10 @@ class gameAPI {
         console.error("[class API: gameScores]", err);
       });
   }
-  static async fillGamePlayer(gid, pid) {
+  static async fillGamePlayer(db, gid, pid) {
     // add played players to the game
-    return games
+    return db
+      .collection("games")
       .updateOne(
         {
           _id: ObjectId(gid),
@@ -486,10 +541,6 @@ class dailyAPI {
       return client.connect();
     })
     .then((_) => {
-      players = client.db(env.db).collection("players");
-      reviews = client.db(env.db).collection("reviews");
-      users = client.db(env.db).collection("users");
-      games = client.db(env.db).collection("games");
       console.log("db connected");
     })
     .catch((err) => {
@@ -503,5 +554,87 @@ class dailyAPI {
   app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
   });
+  const typeDefs = readFileSync("./schema.graphql").toString("utf-8");
+  const resolvers = require("./resolvers");
+  const schema = makeExecutableSchema({
+    resolvers,
+    resolverValidationOptions: {
+      requireResolversForAllFields: "warn",
+      requireResolversToMatchSchema: "warn",
+    },
+    typeDefs,
+  });
+  app.use(
+    "/graphql",
+    graphqlHTTP(async (req) => {
+      return {
+        schema,
+        graphiql: true,
+        context: {
+          db: client.db(env.db),
+          playerAPI: playerAPI,
+          gameAPI: gameAPI,
+          reviewAPI: reviewAPI,
+          userAPI: userAPI,
+          loaders: {
+            player: new DataLoader((keys) =>
+              loadPlayers(client.db(env.db), keys)
+            ),
+            review: new DataLoader((keys) =>
+              loadReviews(client.db(env.db), keys)
+            ),
+            user: new DataLoader((keys) => loadUsers(client.db(env.db), keys)),
+            game: new DataLoader((keys) => loadGames(client.db(env.db), keys)),
+          },
+        },
+      };
+    })
+  );
+
   app.listen(port);
+  console.log(`GraphQL API server running at http://localhost:${port}/graphql`);
 })();
+async function loadPlayers(db, keys) {
+  const players = await db.collection("players").find().toArray();
+  const result = players.reduce((acc, document) => {
+    acc[document._id] = document;
+    return acc;
+  }, {});
+  return keys.map(
+    (key) => result[key] || new Error(`player [${key}] does not exist `)
+  );
+}
+
+async function loadReviews(db, keys) {
+  const reviews = await db.collection("reviews").find().toArray();
+  const result = reviews.reduce((acc, document) => {
+    acc[document._id] = document;
+    return acc;
+  }, {});
+  return keys.map(
+    (key) => result[key] || new Error(`review [${key}] does not exist `)
+  );
+}
+
+async function loadUsers(db, keys) {
+  const users = await db.collection("users").find().toArray();
+  const result = users.reduce((acc, document) => {
+    acc[document._id] = document;
+    return acc;
+  }, {});
+  return keys.map(
+    (key) => result[key] || new Error(`user [${key}] does not exist `)
+  );
+}
+
+async function loadGames(db, keys) {
+  const games = await db.collection("games").find().toArray();
+  const result = games.reduce((acc, document) => {
+    // console.log(index++, typeof document, typeof document._id, typeof acc);
+    acc[document._id.toString()] = document;
+    return acc;
+  }, {});
+  return keys.map(
+    (key) => result[key] || new Error(`game [${key}] does not exist `)
+  );
+}
