@@ -191,6 +191,9 @@ const resolvers = {
           return idList.map((id) => context.loaders.player.load(id));
         })
     },
+    changePassword: async (_, {uid, new_password}, context) => {
+      return context.userAPI.changePwd(context.db, uid, new_password);
+    }
   },
 };
 

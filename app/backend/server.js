@@ -361,8 +361,21 @@ class userAPI {
         return player.follows;
       });
   }
-  static async changePwd() {
-    // TODO:user  changes password
+  static async changePwd(db, uid, new_password) {
+    // user changes password
+    const users = db.collection("users");
+    return await users
+      .updateOne(
+        {
+        _id: ObjectId(uid),
+        },
+        {
+          password: new_password
+        }
+      )
+      .then(() => {
+        return uid;
+      });
   }
 }
 
