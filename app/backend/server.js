@@ -7,11 +7,11 @@ const express = require("express");
 const { MongoClient, ObjectId, Int32 } = require("mongodb");
 const { graphqlHTTP } = require("express-graphql");
 const DataLoader = require("dataloader");
-const cors = require('cors');
+const cors = require("cors");
 const app = express();
 // 处理跨域请求
 app.use(cors());
-app.use(express.json());//express.json=bodyParser.json
+app.use(express.json()); //express.json=bodyParser.json
 app.use(express.urlencoded({ extended: true }));
 const {
   readFileSync,
@@ -227,9 +227,13 @@ class reviewAPI {
     });
   }
   static async getShadow(db, pid, gid) {
-    return db.collection("reviews").find({player: pid, game: gid}).then((doc) => {
-      return doc._id;
-    });
+    return db
+      .collection("reviews")
+      .findOne({ player: ObjectId(pid), game: ObjectId(gid) })
+      .then((doc) => {
+        console.log(doc);
+        return doc._id;
+      });
   }
 
   static async ShadowReview(db, pid, gid, playerstats) {
@@ -253,7 +257,15 @@ class reviewAPI {
       });
     // when the game is locked, replace shadow review
   }
-  static async newReview(db, pid, gid, uid, shadow_review_id, new_comment, new_rating) {
+  static async newReview(
+    db,
+    pid,
+    gid,
+    uid,
+    shadow_review_id,
+    new_comment,
+    new_rating
+  ) {
     // create a new review with new rating and comments. return review ID
     const reviews = db.collection("reviews");
     const playerstats = reviewAPI.playerStats(db, shadow_review_id);
@@ -271,7 +283,7 @@ class reviewAPI {
       .then((created) => {
         const rid = created.insertedId;
         playerAPI.appendReview(db, pid, rid);
-        userAPI.writeReview(db, uid, rid)
+        userAPI.writeReview(db, uid, rid);
         return rid;
       });
   }
@@ -322,17 +334,16 @@ class userAPI {
     });
   }
   static async createUser(db, username, password) {
-    // create a new user
-    const users = db.collection("users");
-    return await users
+    // create a new user,return ID
+    return await db
+      .collection("users")
       .insertOne({
         _id: ObjectId(),
         username: username,
         password: password,
       })
       .then((created) => {
-        const uid = created.insertedId;
-        return uid;
+        return created.insertedId;
       });
   }
   static async writeReview(db, uid, rid) {
@@ -354,9 +365,9 @@ class userAPI {
       });
   }
   static async startFollow(db, pid, uid) {
-    // user start to follow a player
-    const users = db.collection("users");
-    return await users
+    // user start to follow a player, return userID
+    return await db
+      .collection("users")
       .updateOne(
         {
           _id: ObjectId(uid),
@@ -368,14 +379,11 @@ class userAPI {
         }
       )
       .then((_) => {
-        return playerAPI.getPlayerbyId(db, pid)
-      })
-      .then((player) => {
-        return player.follows;
+        return uid;
       });
   }
   static async unFollow(db, pid, uid) {
-    // user stop following a player
+    // user stop following a player,return userID
     const users = db.collection("users");
     return await users
       .updateOne(
@@ -389,10 +397,7 @@ class userAPI {
         }
       )
       .then((_) => {
-        return playerAPI.getPlayerbyId(db, pid)
-      })
-      .then((player) => {
-        return player.follows;
+        return uid;
       });
   }
   static async changePwd(db, uid, new_password) {
@@ -401,10 +406,10 @@ class userAPI {
     return await users
       .updateOne(
         {
-        _id: ObjectId(uid),
+          _id: ObjectId(uid),
         },
         {
-          password: new_password
+          $set: { password: new_password },
         }
       )
       .then(() => {
@@ -421,11 +426,11 @@ class gameAPI {
       .findOne({
         _id: ObjectId(gid),
       })
-      .then((user) => {
-        if (user) {
-          return user;
+      .then((game) => {
+        if (game) {
+          return game;
         } else {
-          console.log(`userID404:${gid}`);
+          console.log(`gameID404:${gid}`);
           return null;
         }
       });
@@ -667,7 +672,7 @@ class dailyAPI {
   };
 }
 
-const { graphql } = require('graphql');
+const { graphql } = require("graphql");
 
 (async function () {
   await readFile(filePath)
