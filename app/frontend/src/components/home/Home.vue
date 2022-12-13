@@ -2,35 +2,90 @@
     <el-card>
         <div v-if="showHome">
             <div class="bc"></div>
-            <div v-for="(o, i) in allMatchesInfo" :key="i" @click="() => selectFunc(i)">
-                <el-row>
-                    <el-col>
-                        <el-card class="box-card marginBottom" shadow="hover">
-                            <div>
-                                {{ o.name }}
-                            </div>
-                            <div>
-                                {{ o.competitions[0].competitors[1].team.name }} VS
-                                {{ o.competitions[0].competitors[0].team.name }}
-                            </div>
-                            <div>
-                                {{ o.competitions[0].competitors[1].score }} : {{
-                                    o.competitions[0].competitors[0].score
-                                }}
-                            </div>
-                        </el-card>
-                    </el-col>
-                </el-row>
+            <div class = "left">
+                <div v-for="(o, i) in allMatchesInfo" :key="i" @click="() => selectFunc(i)">
+                    <el-row>
+                        <el-col>
+                            <el-card class="box-card marginBottom" shadow="hover">
+                                <div>
+                                    {{ o.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].team.name }} VS
+                                    {{ o.competitions[0].competitors[0].team.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].score }} : {{
+                                        o.competitions[0].competitors[0].score
+                                    }}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </div>
             </div>
+
+
+            <div class = "middle">
+                <div v-for="(o, i) in allMatchesInfo" :key="i" @click="() => selectFunc(i)">
+                    <el-row>
+                        <el-col>
+                            <el-card class="box-card marginBottom" shadow="hover">
+                                <div>
+                                    {{ o.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].team.name }} VS
+                                    {{ o.competitions[0].competitors[0].team.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].score }} : {{
+                                        o.competitions[0].competitors[0].score
+                                    }}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+
+
+            <div class = "right">
+                <div v-for="(o, i) in allMatchesInfo" :key="i" @click="() => selectFunc(i)">
+                    <el-row>
+                        <el-col>
+                            <el-card class="box-card marginBottom" shadow="hover">
+                                <div>
+                                    {{ o.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].team.name }} VS
+                                    {{ o.competitions[0].competitors[0].team.name }}
+                                </div>
+                                <div>
+                                    {{ o.competitions[0].competitors[1].score }} : {{
+                                        o.competitions[0].competitors[0].score
+                                    }}
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+
         </div>
 
+
+
+
         <div v-if="showGameDeatil">
-            <GameDetail/>
+            <GameDetail :return-home="returnHome"/>
         </div>
     </el-card>
 </template>
 
 <script>
+// import gql from "graphql-tag"
 import axios from "axios";
 import GameDetail from "@/components/Games/GameDetail";
 
@@ -60,6 +115,11 @@ export default {
             // })
             this.showHome = false
             this.showGameDeatil = true
+        },
+
+        returnHome() {
+            this.showHome = true
+            this.showGameDeatil = false
         }
     },
 
@@ -80,5 +140,33 @@ export default {
 
 .marginBottom {
     margin-bottom: 10px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.main {
+    width: 800px;
+    margin: 0 auto;
+}
+
+.left {
+    width: 33.33%;
+    background: white;
+    float: left;
+}
+
+.middle {
+    width: 33.33%;
+    background: white;
+    float: left;
+}
+
+.right {
+    width: 33.33%;
+    background: white;
+    float: right;
 }
 </style>

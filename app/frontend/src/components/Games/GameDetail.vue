@@ -5,7 +5,7 @@
         </div>
 
         <div>
-            <PlayerRates v-if="showComments"/>
+            <PlayerRates v-if="showComments" :return-home="returnHome"/>
         </div>
     </div>
 </template>
@@ -15,6 +15,9 @@ import PlayerRates from "@/components/player/PlayerRates";
 export default {
     name: "GameDetail",
     components: {PlayerRates},
+    props: {
+      returnHome: Function
+    },
     data() {
         return {
             showComments: false

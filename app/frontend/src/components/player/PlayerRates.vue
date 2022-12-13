@@ -40,7 +40,9 @@
 <script>
 export default {
     components: {},
-    props: [],
+    props: {
+        returnHome: Function
+    },
     data() {
         return {
             iconClasses: ['el-icon-basketball','el-icon-basketball','el-icon-basketball'],
@@ -92,11 +94,11 @@ export default {
             this.$refs['elForm'].validate(valid => {
                 if (!valid) return
                 // TODO 提交表单
-                // console.log(this.formData.field103)
-                // console.log(this.formData.field104)
-                // console.log(this.formData.field105)
-                // console.log(this.formData.field106)
-                // console.log(this.formData.field112)
+                console.log(this.formData.field103)
+                console.log(this.formData.field104)
+                console.log(this.formData.field105)
+                console.log(this.formData.field106)
+                console.log(this.formData.field112)
                 const h = this.$createElement;
                 this.$message({
                     message: h('p', null, [
@@ -105,9 +107,8 @@ export default {
                     ])
                 });
             })
-
             this.resetForm()
-            this.$router.push("/home")
+            this.returnHome()
         },
         resetForm() {
             this.$refs['elForm'].resetFields()
