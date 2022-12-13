@@ -183,7 +183,14 @@ const resolvers = {
         .then((idList) => {
           return idList.map((id) => context.loaders.player.load(id));
         })
-    }
+    },
+    unfollow: async (_, {pid, uid}, context) => {
+      return await context.userAPI
+        .startFollow(context.db, pid, uid)
+        .then((idList) => {
+          return idList.map((id) => context.loaders.player.load(id));
+        })
+    },
   },
 };
 

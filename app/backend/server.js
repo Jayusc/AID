@@ -320,7 +320,7 @@ class userAPI {
       });
   }
   static async startFollow(db, pid, uid) {
-    // TODO:user start to follow a player
+    // user start to follow a player
     const users = db.collection("users");
     return await users
       .updateOne(
@@ -340,8 +340,26 @@ class userAPI {
         return player.follows;
       });
   }
-  static async unFollow() {
-    // TODO:user stop follow one player
+  static async unFollow(db, pid, uid) {
+    // user stop following a player
+    const users = db.collection("users");
+    return await users
+      .updateOne(
+        {
+          _id: ObjectId(uid),
+        },
+        {
+          $pull: {
+            follows: pid,
+          },
+        }
+      )
+      .then((_) => {
+        return playerAPI.getPlayerbyId(db, pid)
+      })
+      .then((player) => {
+        return player.follows;
+      });
   }
   static async changePwd() {
     // TODO:user  changes password

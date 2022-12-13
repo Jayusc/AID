@@ -70,4 +70,6 @@ type Mutation {
   createUser(username: String!, password: String!): ID!
 
   follow(pid: ID!, uid: id!): [Player]
+
+  unfollow(pid: ID!, uid: id!): [Player]
 }
