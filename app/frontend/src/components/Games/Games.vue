@@ -1,6 +1,6 @@
 <template>
     <div>
-        <GamesList :players="playersList" :selectFunc="enterCommentsPage" v-if="showPlayersList"/>
+        <GamesList :players="PostMatchList" :selectFunc="enterCommentsPage" v-if="showPlayersList"/>
         <PlayerRates v-if="showComments"/>
     </div>
 </template>
@@ -9,12 +9,14 @@
 // import PlayersList from "@/components/player/PlayersList";
 import PlayerRates from "@/components/player/PlayerRates";
 import GamesList from "@/components/Games/GamesList";
+// import axios from "axios";
+import axios from "axios";
 export default {
     name: "GamesPage",
     components: {PlayerRates, GamesList},
     data() {
         return {
-            playersList: [1, 1, 1, 1, 1],
+            PostMatchList: [],
             showPlayersList: true,
             selectedPlayerId: null,
             showComments: false
@@ -26,12 +28,20 @@ export default {
             this.selectedPlayerId = id
             this.showComments = true
             this.showPlayersList = false
+        },
+        getPostmatchinfo(){
+            axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard")
+                .then(r => {
+                    // console.log(r.data.events)
+                    this.PostMatchList = r.data.events
+                })
         }
     },
-
     created() {
-
+        this.getPostmatchinfo()
     }
+
+
 }
 </script>
 

@@ -4,6 +4,7 @@ import Home from "@/components/home/Home";
 import Teams from "@/components/team/Teams";
 import Players from "@/components/player/Players";
 import Games from "@/components/Games/Games";
+import LoginPage from "@/components/LoginPage";
 
 Vue.use(VueRouter)
 
@@ -29,16 +30,6 @@ const routes = [
         path: '/teams',
         name: 'teams',
         component: Teams,
-    },
-    {
-        path: '/players',
-        name: 'players',
-        component: Players,
-    },
-    {
-        path: '/games',
-        name: 'games',
-        component: Games,
     },
 ]
 

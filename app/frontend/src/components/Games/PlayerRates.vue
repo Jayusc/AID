@@ -9,7 +9,7 @@
                 <el-rate v-model="formData.field104" :max='5' allow-half show-score></el-rate>
             </el-form-item>
             <el-form-item label-width="132px" label="Ability 2" prop="field105">
-                <el-rate v-model="formData.field105" :max='5' allow-half show-score></el-rate>
+                <el-rate v-model="formData.field105" :icon-classes="iconClasses" :max='5' allow-half show-score></el-rate>
             </el-form-item>
             <el-form-item label-width="132px" label="Ability 3" prop="field106">
                 <el-rate v-model="formData.field106" :max='5' allow-half show-score></el-rate>
@@ -31,6 +31,7 @@ export default {
     props: [],
     data() {
         return {
+            iconClasses: ['el-icon-basketball'],
             formData: {
                 field103: 0,
                 field104: 0,

@@ -1,15 +1,15 @@
 version: "3.9"
 services:
-  server:
-    container_name: aid-backend
-    build: ./app/backend
-    restart: unless-stopped
-    ports:
-      - 3022:3020
-    volumes:
-      - ./app/backend:/usr/src/app
-    depends_on:
-      - mongodb
+#  server:
+#    container_name: aid-backend
+#    build: ./app/backend
+#    restart: unless-stopped
+#    ports:
+#      - 3022:3020
+#    volumes:
+#      - ./app/backend:/usr/src/app
+#    depends_on:
+#      - mongodb
 #  vue:
 #    container_name: aid-frontend
 #    build: ./app/frontend
