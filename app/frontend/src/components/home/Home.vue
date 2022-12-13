@@ -1,7 +1,7 @@
 <template>
     <el-card>
         <div v-if="showHome">
-            <div class="bc"></div>
+            <div class="bc" @click="shuaxin"></div>
             <div class="left">
                 <div v-for="(o, i) in gid" :key="i" @click="() => selectFunc(i)">
                     <el-row>
@@ -12,13 +12,14 @@
 
                                 </div>
                                 <div>
-                                    {{TeamAbbtoFull1[o.team_Home]
+                                    {{
+                                        TeamAbbtoFull1[o.team_Home]
                                     }} VS
                                     {{ TeamAbbtoFull1[o.team_Away] }}
 
                                 </div>
-                                <div class = "HomePage">
-                                    {{games}}
+                                <div class="HomePage">
+                                    {{ time }}
                                     <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
                                     <!--                                        o.competitions[0].competitors[0].score-->
                                     <!--                                    }}-->
@@ -36,16 +37,17 @@
                         <el-col>
                             <el-card class="box-card marginBottom" shadow="hover">
                                 <div>
-                                    {{ o.name }}
+                                    {{ "2022-12-12" }}
                                 </div>
                                 <div>
-                                    {{ o.competitions[0].competitors[1].team.name }} VS
-                                    {{ o.competitions[0].competitors[0].team.name }}
+                                    <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
+                                    <!--                                    {{ o.competitions[0].competitors[0].team.name }}-->
+                                    {{ "Atlanta Hawks VS Memphis Grizzlies" }}
                                 </div>
                                 <div>
-                                    {{ o.competitions[0].competitors[1].score }} : {{
-                                        o.competitions[0].competitors[0].score
-                                    }}
+                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                                    <!--                                        o.competitions[0].competitors[0].score }}-->
+                                    {{ "98:130" }}
                                 </div>
                             </el-card>
                         </el-col>
@@ -60,16 +62,19 @@
                         <el-col>
                             <el-card class="box-card marginBottom" shadow="hover">
                                 <div>
-                                    {{ o.name }}
+                                    <!--                                    {{ o.name }}-->
+                                    {{ "2022-12-13" }}
                                 </div>
                                 <div>
-                                    {{ o.competitions[0].competitors[1].team.name }} VS
-                                    {{ o.competitions[0].competitors[0].team.name }}
+                                    {{ "Oklahoma City Thunder at Dallas Mavericks" }}
+                                    <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
+                                    <!--                                    {{ o.competitions[0].competitors[0].team.name }}-->
                                 </div>
                                 <div>
-                                    {{ o.competitions[0].competitors[1].score }} : {{
-                                        o.competitions[0].competitors[0].score
-                                    }}
+                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                                    <!--                                        o.competitions[0].competitors[0].score-->
+                                    <!--                                    }}-->
+                                    {{ "Coming next" }}
                                 </div>
                             </el-card>
                         </el-col>
@@ -114,9 +119,10 @@ export default {
             showGameDeatil: false,
             showHome: true,
             gid: [],
-            // games: [],
-            outcome: [],
+            games: [],
+            outcome: null,
             TeamAbbtoFull1: TeamAbbtoFull,
+            time: [],
         }
     },
 
@@ -140,6 +146,9 @@ export default {
             this.showHome = true
             this.showGameDeatil = false
         },
+        shuaxin() {
+            console.log(this.games)
+        }
     },
 
     created() {
@@ -164,16 +173,33 @@ export default {
             },
             // 静态参数
             variables: {
-                date: '2022-12-11',
+                date: '2022-12-12',
             },
             // fetchPolicy: "no-cors"
             // no-core
         },
-        games: gql`query Query($date: String) {
-            games(date: $date){
 
-            }
-        }`
+        time: {
+            // gql 查询
+            query: gql`query Query($date: String) {
+                games(date: $date){
+                    time
+                }
+            }`,
+            update(data) {
+                // console.log(this.games)
+                return data.games;
+
+            },
+            // 静态参数
+            variables: {
+                date: '2022-12-12',
+            },
+            // fetchPolicy: "no-cors"
+            // no-core
+        },
+
+
     },
 }
 </script>
