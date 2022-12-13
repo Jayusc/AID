@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
     name: "PlayersList",
     props: {
@@ -16,6 +18,7 @@ export default {
         selectFunc: Function,
     },
     methods: {
+
 
     }
 }

@@ -1,11 +1,11 @@
 <template>
     <el-card>
         <div v-if="showAllTeams">
-            <div v-for="(o,i) in allTeams" :key="i" @click="() => enterTeamDetail(o.team.displayName)">
+            <div v-for="(o,i) in allTeams" :key="i" @click="() => enterTeamDetail(o.team.displayName, o.team.abbreviation)">
                 <TeamCard :imgUrl="o.team.logos[0].href" :teamName="o.team.displayName"/>
             </div>
         </div>
-        <TeamDetail v-if="!showAllTeams" :name="selectedTeamName"/>
+        <TeamDetail v-if="!showAllTeams" :name="selectedTeamName" :abbr="Abbrname" />
     </el-card>
 </template>
 
@@ -22,7 +22,8 @@ export default {
         return {
             allTeams: [],
             showAllTeams: true,
-            selectedTeamName: ""
+            selectedTeamName: "",
+            Abbrname: "",
         }
     },
 
@@ -33,9 +34,11 @@ export default {
             })
         },
 
-        enterTeamDetail(name) {
+        enterTeamDetail(name, abbr) {
             this.selectedTeamName = name
+            this.Abbrname = abbr
             this.showAllTeams = false
+
         }
     },
 
