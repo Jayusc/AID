@@ -3,12 +3,13 @@
         <div v-if="showHome">
             <div class="bc" @click="shuaxin"></div>
             <div class="left">
-                <div v-for="(o, i) in gid" :key="i" @click="() => selectFunc(i)">
+                <div v-for="(o, i) in gid" :key="i" @click="() => selectFunc(gid[i])">
                     <el-row >
                         <el-col >
                             <el-card class="box-card marginBottom" shadow="hover" width = "40px">
                                 <div>
                                     {{ o.time }}
+<!--                                    {{o.players.pid}}-->
 
                                 </div>
                                 <div>
@@ -32,12 +33,13 @@
 
 
             <div class="middle">
-                <div v-for="(o, i) in time" :key="i" @click="() => selectFunc(i)">
+                <div v-for="(o, i) in time" :key="i" @click="() => selectFunc(time[i])">
                     <el-row>
                         <el-col>
                             <el-card class="box-card marginBottom" shadow="hover">
                                 <div>
                                     {{ o.time }}
+<!--                                    {{o.gid}}-->
                                 </div>
                                 <div>
                                     <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
@@ -60,7 +62,7 @@
 
 
             <div class="right">
-                <div v-for="(o, i) in team_Away" :key="i" @click="() => selectFunc(i)">
+                <div v-for="(o, i) in team_Away" :key="i" @click="() => selectFunc(gid[i])">
                     <el-row>
                         <el-col>
                             <el-card class="box-card marginBottom" shadow="hover">
@@ -88,9 +90,9 @@
                 </div>
             </div>
         </div>
+        <GameDetail v-if="showGameDeatil" :gameid="specificGameId"/>
 
-
-        <div v-if="showGameDeatil">
+        <div v-if="showGameDeatil" >
             <GameDetail :return-home="returnHome"/>
         </div>
     </el-card>
@@ -100,8 +102,8 @@
 import gql from "graphql-tag"
 import axios from "axios";
 import GameDetail from "@/components/Games/GameDetail";
-// import TeamAbbtoFull from "@/components/TeamCorresponding"
-import {TeamAbbtoFull} from "./TeamCorresponding";
+// import TeamAbbtoFull from "@/components/TeamCorresponding"22
+import {zhuanhuan} from "./TeamCorresponding";
 
 // const query = `query($date:String) {
 //       games(date: $date) {
@@ -125,9 +127,11 @@ export default {
             showGameDeatil: false,
             showHome: true,
             gid: [],
-            TeamAbbtoFull1: TeamAbbtoFull,
+            TeamAbbtoFull1: zhuanhuan,
             time: [],
             team_Away: [],
+            specificGameId: null,
+            playersid:[]
         }
     },
 
@@ -138,8 +142,10 @@ export default {
             })
         },
 
-        selectFunc(id) {
-            console.log(id)
+        selectFunc(id1) {
+            this.specificGameId = id1
+            console.log(id1)
+            // this.
             // axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
             //     this.gameInfo = r.data.xxxxx
             // })
@@ -152,7 +158,7 @@ export default {
             this.showGameDeatil = false
         },
         shuaxin() {
-            console.log(this.time)
+            // console.log(this.gid)
         }
     },
 
@@ -172,6 +178,13 @@ export default {
                 outcome{
                 home
                 away
+                }
+                players{
+                pid
+                name
+                recent_reviews{
+                rid
+                }
                 }
                 }
             }`,
@@ -202,8 +215,10 @@ export default {
                 players{
                 pid
                 name
+                recent_reviews{
+                rid
                 }
-
+                }
                 }
             }`,
             update(data) {
