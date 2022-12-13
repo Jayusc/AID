@@ -231,7 +231,7 @@ class reviewAPI {
         stats: playerstats,
         ratings: new_rating,
         comments: new_comment,
-        votes: null,
+        votes: 0,
         shadow: false,
       })
       .then((created) => {
