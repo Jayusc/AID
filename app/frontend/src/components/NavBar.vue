@@ -11,6 +11,9 @@
             <el-menu-item index="Home">Home</el-menu-item>
             <el-menu-item index="Teams">Teams</el-menu-item>
             <div style="float: right; position: relative; top: 10px; margin-right: 10px">
+                <el-button type="info" @click="enterProfile">Profile</el-button>
+            </div>
+            <div style="float: right; position: relative; top: 10px; margin-right: 10px">
                 <el-button type="info" @click="dialogVisible = true">Login</el-button>
             </div>
         </el-menu>
@@ -89,6 +92,10 @@ export default {
     },
 
     methods: {
+        enterProfile() {
+            this.$router.push("/profile")
+        },
+
         handleSelect(key) {
             if (key === "Home" && this.$route.path !== "/home") {
                 this.$router.push("/home")

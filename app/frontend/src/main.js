@@ -6,9 +6,10 @@ import router from "@/router/index";
 import ApolloClient from 'apollo-boost'
 const apolloClient = new ApolloClient({
     // 服务器的地址，注意后台添加graphql这个路由
-    uri: 'http://127.0.0.1:3020/graphql'
+    uri: 'http://127.0.0.1:3022/graphql'
 })
 import VueApollo from 'vue-apollo'
+
 Vue.use(VueApollo);
 const apolloProvider = new VueApollo({
     defaultClient: apolloClient

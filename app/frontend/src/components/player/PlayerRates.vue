@@ -102,8 +102,8 @@ export default {
                 const h = this.$createElement;
                 this.$message({
                     message: h('p', null, [
-                        h('span', null, 'Message can be '),
-                        h('i', { style: 'color: teal' }, 'VNode')
+                        // h('span', null, 'Message can be '),
+                        h('i', { style: 'color: teal' }, 'Comment upload successfully!')
                     ])
                 });
             })
