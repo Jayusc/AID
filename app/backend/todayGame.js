@@ -1,9 +1,7 @@
 "use strict";
-const port = 3021;
 const path = require("path");
 const axios = require("axios");
 const filePath = path.join(__dirname, "/config.json");
-const express = require("express");
 const { MongoClient, ObjectId, Int32 } = require("mongodb");
 const {
   promises: { readFile },
@@ -11,11 +9,45 @@ const {
 const bodyParser = require("body-parser");
 let env, uri, client;
 let players, reviews, users, games;
-const timer = require("timers");
 
-const app = express();
 class playerAPI {
   constructor() {}
+  static async getPlayerbyId(pid) {
+    return await players
+      .findOne({
+        _id: ObjectId(pid),
+      })
+      .then((player) => {
+        if (player) {
+          return player;
+        } else {
+          console.log(`playerID404:${pid}`);
+          return null;
+        }
+      });
+  }
+
+  static async getRecentRevs(pid) {
+    return await playerAPI.getPlayerbyId(pid).then((player) => {
+      return player ? player.recent_revs : null;
+    });
+  }
+  static async getPlayerRating(pid) {
+    return await playerAPI.getPlayerbyId(pid).then((player) => {
+      return player ? player.ave_rating : null;
+    });
+  }
+
+  static async PlayerfName(pid) {
+    return await playerAPI.getPlayerbyId(pid).then((player) => {
+      return player ? player.first_name : null;
+    });
+  }
+  static async PlayerlName(pid) {
+    return await playerAPI.getPlayerbyId(pid).then((player) => {
+      return player ? player.last_name : null;
+    });
+  }
   static async findPlayerbyName(first_name, last_name) {
     // return player ID
     return await players
@@ -35,6 +67,7 @@ class playerAPI {
         console.error("[findPlayerbyName]", err);
       });
   }
+
   static async updateRating(pid, rating) {
     // update rating from user
     return await players.updateOne(
@@ -43,7 +76,7 @@ class playerAPI {
       },
       {
         $set: {
-          average_rating: rating,
+          ave_rating: rating,
         },
       }
     );
@@ -58,7 +91,7 @@ class playerAPI {
         },
         {
           $push: {
-            recent_games: rid,
+            recent_revs: rid,
           },
         }
       )
@@ -66,10 +99,69 @@ class playerAPI {
         return rid;
       });
   }
+
+  static async getRecentReviews(pid) {
+    return await playerAPI.getPlayerbyId(pid).then((player) => {
+      if (player) {
+        const rids = player.recent_revs;
+      }
+    });
+  }
 }
 
 class reviewAPI {
   constructor() {}
+  static async getReviewById(rid) {
+    return await reviews
+      .findOne({
+        _id: ObjectId(rid),
+      })
+      .then((review) => {
+        if (review) {
+          return review;
+        } else {
+          console.log(`reviewID404:${rid}`);
+          return null;
+        }
+      });
+  }
+  static async belongGame(rid) {
+    return await reviewAPI.getReviewById(rid).then((review) => {
+      return review ? review.game : null;
+    });
+  }
+  static async gameStats(rid) {
+    return await reviewAPI.getReviewById(rid).then((review) => {
+      return review ? review.stats : null;
+    });
+  }
+  static async getRating(rid) {
+    return await reviewAPI.getReviewById(rid).then((review) => {
+      return review ? review.rating : null;
+    });
+  }
+  static async getComment(rid) {
+    return await reviewAPI.getReviewById(rid).then((review) => {
+      return review ? review.comment : null;
+    });
+  }
+  static async getVotes(rid) {
+    return await reviewAPI.getReviewById(rid).then((review) => {
+      return review ? review.votes : null;
+    });
+  }
+  static async upVote(rid) {
+    // upvote this
+  }
+  static async downVote(rid) {
+    // downvote this
+  }
+  static async isShadow(rid) {
+    return await reviewAPI.getReviewById(rid).then((review) => {
+      return review ? review.shadow : null;
+    });
+  }
+
   static async ShadowReview(pid, gid, playerstats) {
     // create a shadow review with no rating and comments. return review ID
     return await reviews
@@ -94,10 +186,98 @@ class reviewAPI {
 
 class userAPI {
   constructor() {}
+  static async getUserById(uid) {
+    return await users
+      .findOne({
+        _id: ObjectId(uid),
+      })
+      .then((user) => {
+        if (user) {
+          return user;
+        } else {
+          console.log(`userID404:${uid}`);
+          return null;
+        }
+      });
+  }
+  static async userReviews(uid) {
+    return await userAPI.getUserById(uid).then((user) => {
+      return user ? user.reviews : null;
+    });
+  }
+  static async userFollows(uid) {
+    return await userAPI.getUserById(uid).then((user) => {
+      return user ? user.follows : null;
+    });
+  }
+  static async userName(uid) {
+    return await userAPI.getUserById(uid).then((user) => {
+      return user ? user.username : null;
+    });
+  }
+  static async userPassword(uid) {
+    return await userAPI.getUserById(uid).then((user) => {
+      return user ? user.password : null;
+    });
+  }
+  static async createUser() {
+    // TODO:create a user here
+  }
+  static async writeReview() {
+    // TODO:user write a review, replicate from shadow review
+  }
+  static async startFollow() {
+    // TODO:user start to follow a player
+  }
+  static async unFollow() {
+    // TODO:user stop follow one player
+  }
+  static async changePwd() {
+    // TODO:user  changes password
+  }
 }
 
 class gameAPI {
   constructor() {}
+  static async getGameById(gid) {
+    return await games
+      .findOne({
+        _id: ObjectId(gid),
+      })
+      .then((user) => {
+        if (user) {
+          return user;
+        } else {
+          console.log(`userID404:${gid}`);
+          return null;
+        }
+      });
+  }
+  static async getHome(gid) {
+    return await gameAPI.getGameById(gid).then((game) => {
+      return game ? game.team_home : null;
+    });
+  }
+  static async getAway(gid) {
+    return await gameAPI.getGameById(gid).then((game) => {
+      return game ? game.team_away : null;
+    });
+  }
+  static async getOutcome(gid) {
+    return await gameAPI.getGameById(gid).then((game) => {
+      return game ? game.outcome : null;
+    });
+  }
+  static async getTime(gid) {
+    return await gameAPI.getGameById(gid).then((game) => {
+      return game ? game.time : null;
+    });
+  }
+  static async getGamePlayers(gid) {
+    return await gameAPI.getGameById(gid).then((game) => {
+      return game ? game.players : null;
+    });
+  }
   static async getSchedule(YYYY, MM, DD, KEY) {
     // Get game schedule from API,return a list of game IDs
     const GET_SCHE_URL = `https://api.sportradar.com/nba/trial/v7/en/games/${YYYY}/${MM}/${DD}/schedule.json?api_key=${KEY}`;
@@ -127,13 +307,6 @@ class gameAPI {
       return gids;
     });
     return res;
-    /*     Promise.all(all_promises)
-      .then((_) => {
-        return res;
-      })
-      .catch((err) => {
-        console.error("[get game schedule]", err);
-      }); */
   }
   static async postGame(gid, KEY) {
     // update database, return a list of reviews(ID) or 404
@@ -147,7 +320,11 @@ class gameAPI {
       .then(async (res) => {
         const gameinfo = res.data;
         const [team_home, team_away] = [gameinfo.home, gameinfo.away];
-        await gameAPI.updateGameScores(gid, team_home.points, team_away.points);
+        await gameAPI.updateGameOutcome(
+          gid,
+          team_home.points,
+          team_away.points
+        );
         /*  for every active player, update Game:players(ID)
        create a review, update Player:recent reviews 
        reviewAPI ================ playerAPI */
@@ -192,7 +369,7 @@ class gameAPI {
         console.error("[should return a list of reviews]", err);
       });
   }
-  static async updateGameScores(gid, h_pts, a_pts) {
+  static async updateGameOutcome(gid, h_pts, a_pts) {
     // update game scores, return game ID
     games
       .updateOne(
@@ -231,6 +408,72 @@ class gameAPI {
   }
 }
 
+class dailyAPI {
+  constructor(date) {
+    this.game_stack = [];
+    this.postgame_reviews = [];
+    this.YYYY = date.getFullYear();
+    this.MM = date.getMonth() + 1;
+    this.DD = date.getDate();
+    this.GameSchedules24hour();
+    this.GameOutcomes24hour();
+  }
+
+  GameSchedules() {
+    // Get today's game schedules
+    gameAPI
+      .getSchedule(this.YYYY, this.MM, this.DD, env.api_key)
+      .then((gameids) => {
+        gameids.forEach((gid) => {
+          this.game_stack.push(gid);
+        });
+      })
+      .catch((err) => {
+        console.error("[GameSchedules]", err);
+      });
+  }
+  GameSchedules24hour() {
+    let initialExecutionTime = new Date();
+    initialExecutionTime.setHours(4);
+    initialExecutionTime.setMinutes(0);
+    initialExecutionTime.setSeconds(0);
+    this.GameSchedules();
+    setTimeout(function () {
+      // execute this at 4:00 AM everyday
+      this.GameSchedules();
+      // repeat every 24 hour
+      setInterval(this.GameSchedules(), 24 * 60 * 60 * 1000);
+    }, initialExecutionTime - Date.now());
+  }
+
+  async GameOutcomes() {
+    if (this.game_stack) {
+      // update game outcomes
+      while (this.game_stack) {
+        game_id = this.game_stack.pop();
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        this.postgame_reviews.push(
+          await gameAPI.postGame(game_id, env.api_key)
+        );
+      }
+    }
+  }
+
+  GameOutcomes24hour() {
+    let initialExecutionTime = new Date();
+    initialExecutionTime.setHours(22);
+    initialExecutionTime.setMinutes(0);
+    initialExecutionTime.setSeconds(0);
+    this.GameOutcomes();
+    setTimeout(function () {
+      // execute this at 10:00 PM everyday
+      this.GameOutcomes();
+      // repeat every 24 hour
+      setInterval(this.GameOutcomes(), 24 * 60 * 60 * 1000);
+    }, initialExecutionTime - Date.now());
+  }
+}
+
 (async function () {
   await readFile(filePath)
     .then((file) => {
@@ -253,7 +496,7 @@ class gameAPI {
   const [YYYY, MM, DD] = [
     today.getFullYear(),
     today.getMonth() + 1,
-    today.getDate() - 1,
+    today.getDate() - 1, //Timezone?
   ];
   gameAPI.getSchedule(YYYY, MM, DD, env.api_key).then(async (gameids) => {
     let rids = [];
@@ -264,11 +507,4 @@ class gameAPI {
     }
     console.log(rids); //review IDs
   });
-
-  app.use(bodyParser.json());
-
-  app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-  });
-  app.listen(port);
 })();
