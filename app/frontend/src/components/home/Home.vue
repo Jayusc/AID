@@ -170,6 +170,10 @@ export default {
             team_Home
             team_Away
             gid
+            outcome{
+                home
+                away
+            }
           }
         }
       `,
