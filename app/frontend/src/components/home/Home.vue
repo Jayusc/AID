@@ -103,7 +103,7 @@ import gql from "graphql-tag"
 import axios from "axios";
 import GameDetail from "@/components/Games/GameDetail";
 // import TeamAbbtoFull from "@/components/TeamCorresponding"22
-import {zhuanhuan} from "./TeamCorresponding";
+import {TeamAbbtoFull} from "./TeamCorresponding";
 
 // const query = `query($date:String) {
 //       games(date: $date) {
@@ -127,7 +127,7 @@ export default {
             showGameDeatil: false,
             showHome: true,
             gid: [],
-            TeamAbbtoFull1: zhuanhuan,
+            TeamAbbtoFull1: TeamAbbtoFull,
             time: [],
             team_Away: [],
             specificGameId: null,
