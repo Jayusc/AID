@@ -219,7 +219,7 @@ class reviewAPI {
       });
     // when the game is locked, replace shadow review
   }
-  static async NewReview(db, pid, gid, uid, shadow_review_id, new_comment, new_rating) {
+  static async newReview(db, pid, gid, uid, shadow_review_id, new_comment, new_rating) {
     // create a new review with new rating and comments. return review ID
     const reviews = db.collection("reviews");
     const playerstats = reviewAPI.playerStats(db, shadow_review_id);
@@ -287,8 +287,18 @@ class userAPI {
       return user ? user.password : null;
     });
   }
-  static async createUser() {
-    // TODO:create a user here
+  static async createUser(db, username, password) {
+    const users = db.collection("users");
+    return await users
+      .insertOne({
+        _id: ObjectId(),
+        username: username,
+        password: password,
+      })
+      .then((created) => {
+        const uid = created.insertedId;
+        return uid;
+      });
   }
   static async writeReview(db, uid, rid) {
     // append new game review to this user, return review id
@@ -300,7 +310,7 @@ class userAPI {
         },
         {
           $push: {
-            recent_revs: rid,
+            reviews: rid,
           },
         }
       )
