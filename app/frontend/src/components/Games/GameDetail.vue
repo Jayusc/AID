@@ -5,7 +5,7 @@
                 {{ TeamAbbtoFull1[gameid.team_Home] }} VS {{ TeamAbbtoFull1[gameid.team_Away] }}
             </div>
             <div @click="openComments" v-if="!showComments">..
-                <div v-for="(o,i) in gameid" :key="i">
+                <div v-for="(o,i) in gameid.players" :key="i">
                     {{ o.name }}
                 </div>
             </div>
