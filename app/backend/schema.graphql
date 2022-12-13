@@ -66,4 +66,16 @@ type Query {
 
 type Mutation {
   writeReview(pid: ID!, gid: ID!, uid: ID!, new_comment: String, new_rating: Float): Review
+
+  createUser(username: String!, password: String!): ID
+
+  follow(pid: ID!, uid: ID!): [Player]
+
+  unfollow(pid: ID!, uid: ID!): [Player]
+  
+  changePassword(uid: ID!, new_password: String!): ID
+
+  upVote(rid: ID!): Int
+
+  downVote(rid: ID!): Int
 }

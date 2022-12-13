@@ -174,25 +174,35 @@ const resolvers = {
     },
   },
   Mutation: {
-    writeReview: async (
-      _,
-      { pid, gid, uid, new_comment, new_rating },
-      context
-    ) => {
-      const shadow_review_id = await context.reviewAPI.getShadow(
-        context.db,
-        pid,
-        gid
-      );
-      return context.reviewAPI.NewReview(
-        context.db,
-        pid,
-        gid,
-        uid,
-        shadow_review_id,
-        new_comment,
-        new_rating
-      );
+    writeReview: async (_, {pid, gid, uid, new_comment, new_rating}, context) => {
+      const shadow_review_id = await context.reviewAPI.getShadow(context.db, pid, gid);
+      return context.reviewAPI.newReview(context.db, pid, gid, uid, shadow_review_id, new_comment, new_rating);
+    },
+    createUser: async (_, {username, password}, context) => {
+      return context.userAPI.createUser(context.db, username, password);
+    },
+    follow: async (_, {pid, uid}, context) => {
+      return await context.userAPI
+        .startFollow(context.db, pid, uid)
+        .then((idList) => {
+          return idList.map((id) => context.loaders.player.load(id));
+        })
+    },
+    unfollow: async (_, {pid, uid}, context) => {
+      return await context.userAPI
+        .startFollow(context.db, pid, uid)
+        .then((idList) => {
+          return idList.map((id) => context.loaders.player.load(id));
+        })
+    },
+    changePassword: async (_, {uid, new_password}, context) => {
+      return context.userAPI.changePwd(context.db, uid, new_password);
+    },
+    upVote: async (_, {rid}, context) => {
+      return context.reviewAPI.upVote(context.db, rid)
+    },
+    downVote: async (_, {rid}, context) => {
+      return context.reviewAPI.downVote(context.db, rid)
     },
   },
 };

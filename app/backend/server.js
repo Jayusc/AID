@@ -188,10 +188,38 @@ class reviewAPI {
     });
   }
   static async upVote(db, rid) {
-    // upvote this
+    // upvote this review
+    const reviews = db.collection("reviews");
+    const previous_votes = await reviewAPI.getVotes(db, rid);
+    return await reviews
+      .updateOne(
+        {
+          _id: ObjectId(rid),
+        },
+        {
+          votes: previous_votes + 1,
+        }
+      )
+      .then((_) => {
+        return previous_votes + 1;
+      });
   }
   static async downVote(db, rid) {
-    // downvote this
+    // downvote this review
+    const reviews = db.collection("reviews");
+    const previous_votes = await reviewAPI.getVotes(db, rid);
+    return await reviews
+      .updateOne(
+        {
+          _id: ObjectId(rid),
+        },
+        {
+          votes: previous_votes - 1,
+        }
+      )
+      .then((_) => {
+        return previous_votes - 1;
+      });
   }
   static async isShadow(db, rid) {
     return await reviewAPI.getReviewById(db, rid).then((review) => {
@@ -199,7 +227,7 @@ class reviewAPI {
     });
   }
   static async getShadow(db, pid, gid) {
-    return context.db.collection("reviews").find({player: pid, game: gid}).then((doc) => {
+    return db.collection("reviews").find({player: pid, game: gid}).then((doc) => {
       return doc._id;
     });
   }
@@ -225,7 +253,7 @@ class reviewAPI {
       });
     // when the game is locked, replace shadow review
   }
-  static async NewReview(db, pid, gid, uid, shadow_review_id, new_comment, new_rating) {
+  static async newReview(db, pid, gid, uid, shadow_review_id, new_comment, new_rating) {
     // create a new review with new rating and comments. return review ID
     const reviews = db.collection("reviews");
     const playerstats = reviewAPI.playerStats(db, shadow_review_id);
@@ -293,8 +321,19 @@ class userAPI {
       return user ? user.password : null;
     });
   }
-  static async createUser() {
-    // TODO:create a user here
+  static async createUser(db, username, password) {
+    // create a new user
+    const users = db.collection("users");
+    return await users
+      .insertOne({
+        _id: ObjectId(),
+        username: username,
+        password: password,
+      })
+      .then((created) => {
+        const uid = created.insertedId;
+        return uid;
+      });
   }
   static async writeReview(db, uid, rid) {
     // append new game review to this user, return review id
@@ -306,7 +345,7 @@ class userAPI {
         },
         {
           $push: {
-            recent_revs: rid,
+            reviews: rid,
           },
         }
       )
@@ -314,14 +353,63 @@ class userAPI {
         return rid;
       });
   }
-  static async startFollow() {
-    // TODO:user start to follow a player
+  static async startFollow(db, pid, uid) {
+    // user start to follow a player
+    const users = db.collection("users");
+    return await users
+      .updateOne(
+        {
+          _id: ObjectId(uid),
+        },
+        {
+          $push: {
+            follows: pid,
+          },
+        }
+      )
+      .then((_) => {
+        return playerAPI.getPlayerbyId(db, pid)
+      })
+      .then((player) => {
+        return player.follows;
+      });
   }
-  static async unFollow() {
-    // TODO:user stop follow one player
+  static async unFollow(db, pid, uid) {
+    // user stop following a player
+    const users = db.collection("users");
+    return await users
+      .updateOne(
+        {
+          _id: ObjectId(uid),
+        },
+        {
+          $pull: {
+            follows: pid,
+          },
+        }
+      )
+      .then((_) => {
+        return playerAPI.getPlayerbyId(db, pid)
+      })
+      .then((player) => {
+        return player.follows;
+      });
   }
-  static async changePwd() {
-    // TODO:user  changes password
+  static async changePwd(db, uid, new_password) {
+    // user changes password
+    const users = db.collection("users");
+    return await users
+      .updateOne(
+        {
+        _id: ObjectId(uid),
+        },
+        {
+          password: new_password
+        }
+      )
+      .then(() => {
+        return uid;
+      });
   }
 }
 
