@@ -1,101 +1,102 @@
 <template>
-    <el-card>
-        <div v-if="showHome">
-            <div class="bc" @click="shuaxin"></div>
-            <div class="left">
-                <div v-for="(o, i) in gid" :key="i" @click="() => selectFunc(i)">
-                    <el-row>
-                        <el-col>
-                            <el-card class="box-card marginBottom" shadow="hover">
-                                <div>
-                                    {{ o.time }}
-
-                                </div>
-                                <div>
-                                    {{
-                                        TeamAbbtoFull1[o.team_Home]
-                                    }} VS
-                                    {{ TeamAbbtoFull1[o.team_Away] }}
-
-                                </div>
-                                <div class="HomePage">
-                                    {{ time }}
-                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
-                                    <!--                                        o.competitions[0].competitors[0].score-->
-                                    <!--                                    }}-->
-                                </div>
-                            </el-card>
-                        </el-col>
-                    </el-row>
+  <el-card>
+    <div v-if="showHome">
+      <div class="bc" @click="shuaxin"></div>
+      <div class="left">
+        <div v-for="(o, i) in gid" :key="i" @click="() => selectFunc(i)">
+          <el-row>
+            <el-col>
+              <el-card class="box-card marginBottom" shadow="hover">
+                <div>
+                  {{ o.time }}
                 </div>
-            </div>
-
-
-            <div class="middle">
-                <div v-for="(o, i) in allMatchesInfo" :key="i" @click="() => selectFunc(i)">
-                    <el-row>
-                        <el-col>
-                            <el-card class="box-card marginBottom" shadow="hover">
-                                <div>
-                                    {{ "2022-12-12" }}
-                                </div>
-                                <div>
-                                    <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
-                                    <!--                                    {{ o.competitions[0].competitors[0].team.name }}-->
-                                    {{ "Atlanta Hawks VS Memphis Grizzlies" }}
-                                </div>
-                                <div>
-                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
-                                    <!--                                        o.competitions[0].competitors[0].score }}-->
-                                    {{ "98:130" }}
-                                </div>
-                            </el-card>
-                        </el-col>
-                    </el-row>
+                <div>
+                  {{ TeamAbbtoFull1[o.team_Home] }} VS
+                  {{ TeamAbbtoFull1[o.team_Away] }}
                 </div>
-            </div>
-
-
-            <div class="right">
-                <div v-for="(o, i) in allMatchesInfo" :key="i" @click="() => selectFunc(i)">
-                    <el-row>
-                        <el-col>
-                            <el-card class="box-card marginBottom" shadow="hover">
-                                <div>
-                                    <!--                                    {{ o.name }}-->
-                                    {{ "2022-12-13" }}
-                                </div>
-                                <div>
-                                    {{ "Oklahoma City Thunder at Dallas Mavericks" }}
-                                    <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
-                                    <!--                                    {{ o.competitions[0].competitors[0].team.name }}-->
-                                </div>
-                                <div>
-                                    <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
-                                    <!--                                        o.competitions[0].competitors[0].score-->
-                                    <!--                                    }}-->
-                                    {{ "Coming next" }}
-                                </div>
-                            </el-card>
-                        </el-col>
-                    </el-row>
+                <div class="HomePage">
+                  {{ time }}
+                  <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                  <!--                                        o.competitions[0].competitors[0].score-->
+                  <!--                                    }}-->
                 </div>
-            </div>
+              </el-card>
+            </el-col>
+          </el-row>
         </div>
+      </div>
 
-
-        <div v-if="showGameDeatil">
-            <GameDetail :return-home="returnHome"/>
+      <div class="middle">
+        <div
+          v-for="(o, i) in allMatchesInfo"
+          :key="i"
+          @click="() => selectFunc(i)"
+        >
+          <el-row>
+            <el-col>
+              <el-card class="box-card marginBottom" shadow="hover">
+                <div>
+                  {{ "2022-12-12" }}
+                </div>
+                <div>
+                  <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
+                  <!--                                    {{ o.competitions[0].competitors[0].team.name }}-->
+                  {{ "Atlanta Hawks VS Memphis Grizzlies" }}
+                </div>
+                <div>
+                  <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                  <!--                                        o.competitions[0].competitors[0].score }}-->
+                  {{ "98:130" }}
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
         </div>
-    </el-card>
+      </div>
+
+      <div class="right">
+        <div
+          v-for="(o, i) in allMatchesInfo"
+          :key="i"
+          @click="() => selectFunc(i)"
+        >
+          <el-row>
+            <el-col>
+              <el-card class="box-card marginBottom" shadow="hover">
+                <div>
+                  <!--                                    {{ o.name }}-->
+                  {{ "2022-12-13" }}
+                </div>
+                <div>
+                  {{ "Oklahoma City Thunder at Dallas Mavericks" }}
+                  <!--                                    {{ o.competitions[0].competitors[1].team.name }} VS-->
+                  <!--                                    {{ o.competitions[0].competitors[0].team.name }}-->
+                </div>
+                <div>
+                  <!--                                    {{ o.competitions[0].competitors[1].score }} : {{-->
+                  <!--                                        o.competitions[0].competitors[0].score-->
+                  <!--                                    }}-->
+                  {{ "Coming next" }}
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showGameDeatil">
+      <GameDetail :return-home="returnHome" />
+    </div>
+  </el-card>
 </template>
 
 <script>
-import gql from "graphql-tag"
+import gql from "graphql-tag";
 import axios from "axios";
 import GameDetail from "@/components/Games/GameDetail";
 // import TeamAbbtoFull from "@/components/TeamCorresponding"
-import {TeamAbbtoFull} from "./TeamCorresponding";
+import { TeamAbbtoFull } from "./TeamCorresponding";
 
 // const query = `query($date:String) {
 //       games(date: $date) {
@@ -110,138 +111,142 @@ import {TeamAbbtoFull} from "./TeamCorresponding";
 // };
 
 export default {
-    name: 'HomePage',
-    components: {GameDetail},
-    data() {
-        return {
-            allMatchesInfo: [],
-            gameInfo: {},
-            showGameDeatil: false,
-            showHome: true,
-            gid: [],
-            games: [],
-            outcome: null,
-            TeamAbbtoFull1: TeamAbbtoFull,
-            time: [],
+  name: "HomePage",
+  components: { GameDetail },
+  data() {
+    return {
+      allMatchesInfo: [],
+      gameInfo: {},
+      showGameDeatil: false,
+      showHome: true,
+      gid: [],
+      games: [],
+      outcome: null,
+      TeamAbbtoFull1: TeamAbbtoFull,
+      time: [],
+    };
+  },
+
+  methods: {
+    getMatchesInfo() {
+      axios
+        .get(
+          "http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
+        )
+        .then((r) => {
+          this.allMatchesInfo = r.data.events;
+        });
+    },
+
+    selectFunc(id) {
+      console.log(id);
+      // axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
+      //     this.gameInfo = r.data.xxxxx
+      // })
+      this.showHome = false;
+      this.showGameDeatil = true;
+    },
+
+    returnHome() {
+      this.showHome = true;
+      this.showGameDeatil = false;
+    },
+    shuaxin() {
+      console.log(this.games);
+    },
+  },
+
+  created() {
+    this.getMatchesInfo();
+  },
+  apollo: {
+    // 带参数的查询
+    gid: {
+      // gql 查询
+      query: gql`
+        query Query($date: String) {
+          games(date: $date) {
+            time
+            team_Home
+            team_Away
+            gid
+          }
         }
+      `,
+      update(data) {
+        // console.log(this.games)
+        return data.games;
+      },
+      // 静态参数
+      variables: {
+        date: "2022-12-12",
+      },
+      // fetchPolicy: "no-cors"
+      // no-core
     },
 
-    methods: {
-        getMatchesInfo() {
-            axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
-                this.allMatchesInfo = r.data.events
-            })
-        },
-
-        selectFunc(id) {
-            console.log(id)
-            // axios.get("http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => {
-            //     this.gameInfo = r.data.xxxxx
-            // })
-            this.showHome = false
-            this.showGameDeatil = true
-        },
-
-        returnHome() {
-            this.showHome = true
-            this.showGameDeatil = false
-        },
-        shuaxin() {
-            console.log(this.games)
+    time: {
+      // gql 查询
+      query: gql`
+        query Query($date: String) {
+          games(date: $date) {
+            time
+          }
         }
+      `,
+      update(data) {
+        // console.log(this.games)
+        return data.games;
+      },
+      // 静态参数
+      variables: {
+        date: "2022-12-12",
+      },
+      // fetchPolicy: "no-cors"
+      // no-core
     },
-
-    created() {
-        this.getMatchesInfo()
-    },
-    apollo: {
-        // 带参数的查询
-        gid: {
-            // gql 查询
-            query: gql`query Query($date: String) {
-                games(date: $date){
-                time
-                team_Home
-                team_Away
-                gid
-                }
-            }`,
-            update(data) {
-                // console.log(this.games)
-                return data.games;
-
-            },
-            // 静态参数
-            variables: {
-                date: '2022-12-12',
-            },
-            // fetchPolicy: "no-cors"
-            // no-core
-        },
-
-        time: {
-            // gql 查询
-            query: gql`query Query($date: String) {
-                games(date: $date){
-                    time
-                }
-            }`,
-            update(data) {
-                // console.log(this.games)
-                return data.games;
-
-            },
-            // 静态参数
-            variables: {
-                date: '2022-12-12',
-            },
-            // fetchPolicy: "no-cors"
-            // no-core
-        },
-
-
-    },
-}
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .bc {
-    width: 920px;
-    height: 613px;
-    background: url("../kristaps_luka_getty_ringer_2.0.png");
-    margin: 0 auto;
+  width: 920px;
+  height: 613px;
+  background: url("../kristaps_luka_getty_ringer_2.0.png");
+  margin: 0 auto;
 }
 
 .marginBottom {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .main {
-    width: 800px;
-    margin: 0 auto;
+  width: 800px;
+  margin: 0 auto;
 }
 
 .left {
-    width: 33.33%;
-    background: white;
-    float: left;
+  width: 33.33%;
+  background: white;
+  float: left;
 }
 
 .middle {
-    width: 33.33%;
-    background: white;
-    float: left;
+  width: 33.33%;
+  background: white;
+  float: left;
 }
 
 .right {
-    width: 33.33%;
-    background: white;
-    float: right;
+  width: 33.33%;
+  background: white;
+  float: right;
 }
 </style>
