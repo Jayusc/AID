@@ -152,7 +152,6 @@ class reviewAPI {
       .toArray();
   }
   static async belongPlayer(db, rid) {
-    // return playerID of the review
     return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.player : null;
     });
@@ -193,6 +192,11 @@ class reviewAPI {
       return review ? review.shadow : null;
     });
   }
+  static async getShadow(db, pid, gid) {
+    return context.db.collection("reviews").find({player: pid, game: gid}).then((doc) => {
+      return doc._id;
+    });
+  }
 
   static async ShadowReview(db, pid, gid, playerstats) {
     // create a shadow review with no rating and comments. return review ID
@@ -214,6 +218,28 @@ class reviewAPI {
         return rid;
       });
     // when the game is locked, replace shadow review
+  }
+  static async NewReview(db, pid, gid, uid, shadow_review_id, new_comment, new_rating) {
+    // create a new review with new rating and comments. return review ID
+    const reviews = db.collection("reviews");
+    const playerstats = reviewAPI.playerStats(db, shadow_review_id);
+    return await reviews
+      .insertOne({
+        _id: ObjectId(),
+        player: pid,
+        game: gid,
+        stats: playerstats,
+        ratings: new_rating,
+        comments: new_comment,
+        votes: 0,
+        shadow: false,
+      })
+      .then((created) => {
+        const rid = created.insertedId;
+        playerAPI.appendReview(db, pid, rid);
+        userAPI.writeReview(db, uid, rid)
+        return rid;
+      });
   }
 }
 
@@ -264,8 +290,23 @@ class userAPI {
   static async createUser() {
     // TODO:create a user here
   }
-  static async writeReview() {
-    // TODO:user write a review, replicate from shadow review
+  static async writeReview(db, uid, rid) {
+    // append new game review to this user, return review id
+    const users = db.collection("users");
+    return await users
+      .updateOne(
+        {
+          _id: ObjectId(uid),
+        },
+        {
+          $push: {
+            recent_revs: rid,
+          },
+        }
+      )
+      .then((_) => {
+        return rid;
+      });
   }
   static async startFollow() {
     // TODO:user start to follow a player
@@ -531,6 +572,8 @@ class dailyAPI {
     }, initialExecutionTime - Date.now());
   };
 }
+
+const { graphql } = require('graphql');
 
 (async function () {
   await readFile(filePath)

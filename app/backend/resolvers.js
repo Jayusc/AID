@@ -173,7 +173,28 @@ const resolvers = {
       return context.loaders.user.load(uid);
     },
   },
-  Mutation: {},
+  Mutation: {
+    writeReview: async (
+      _,
+      { pid, gid, uid, new_comment, new_rating },
+      context
+    ) => {
+      const shadow_review_id = await context.reviewAPI.getShadow(
+        context.db,
+        pid,
+        gid
+      );
+      return context.reviewAPI.NewReview(
+        context.db,
+        pid,
+        gid,
+        uid,
+        shadow_review_id,
+        new_comment,
+        new_rating
+      );
+    },
+  },
 };
 
 module.exports = resolvers;
