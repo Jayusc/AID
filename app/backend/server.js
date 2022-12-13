@@ -221,7 +221,7 @@ class reviewAPI {
     });
   }
   static async getShadow(db, pid, gid) {
-    return context.db.collection("reviews").find({player: pid, game: gid}).then((doc) => {
+    return db.collection("reviews").find({player: pid, game: gid}).then((doc) => {
       return doc._id;
     });
   }
