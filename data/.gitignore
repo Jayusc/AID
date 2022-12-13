@@ -1,4 +1,5 @@
 *
+/mongodump*/.DS_Store
 !.gitignore
 !/mongodump*
 !/mongodump*/*
