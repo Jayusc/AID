@@ -1,7 +1,7 @@
 type Player {
   pid: ID!
   recent_reviews: [Review]
-  average_rating: float
+  average_rating: Float
   fname: String
   lname: String
   name: String
@@ -12,7 +12,7 @@ type Review {
   player: Player
   game: Game
   stats: Stats
-  ratings: float
+  ratings: Float
   comments: String
   votes: Int
   shadow: Boolean

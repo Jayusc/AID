@@ -12,6 +12,10 @@ const {
   promises: { readFile },
 } = require("fs");
 const bodyParser = require("body-parser");
+const {
+  assertResolversPresent,
+  makeExecutableSchema,
+} = require("@graphql-tools/schema");
 let env, uri, client;
 const app = express();
 class playerAPI {
@@ -33,8 +37,11 @@ class playerAPI {
   }
 
   static async getAllPlayers(db) {
-    const players = db.collection("players");
-    return await players.find().toArray();
+    return await db
+      .collection("players")
+      .find()
+      .map((p) => p._id)
+      .toArray();
   }
 
   static async getRecentRevs(db, pid) {
@@ -138,14 +145,23 @@ class reviewAPI {
       });
   }
   static async getAllReviews(db) {
-    return await db.collection("reviews").find().toArray();
+    return await db
+      .collection("reviews")
+      .find()
+      .map((p) => p._id)
+      .toArray();
+  }
+  static async belongPlayer(db, rid) {
+    return await reviewAPI.getReviewById(db, rid).then((review) => {
+      return review ? review.player : null;
+    });
   }
   static async belongGame(db, rid) {
     return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.game : null;
     });
   }
-  static async gameStats(db, rid) {
+  static async playerStats(db, rid) {
     return await reviewAPI.getReviewById(db, rid).then((review) => {
       return review ? review.stats : null;
     });
@@ -218,7 +234,11 @@ class userAPI {
       });
   }
   static async getAllUsers(db) {
-    return await db.collection("users").find().toArray();
+    return await db
+      .collection("users")
+      .find()
+      .map((p) => p._id)
+      .toArray();
   }
   static async userReviews(db, uid) {
     return await userAPI.getUserById(db, uid).then((user) => {
@@ -275,7 +295,11 @@ class gameAPI {
       });
   }
   static async getAllGames(db) {
-    return await db.collection("games").find().toArray();
+    return await db
+      .collection("games")
+      .find()
+      .map((p) => p._id)
+      .toArray();
   }
   static async getHome(db, gid) {
     return await gameAPI.getGameById(db, gid).then((game) => {
@@ -524,7 +548,6 @@ class dailyAPI {
   });
   const typeDefs = readFileSync("./schema.graphql").toString("utf-8");
   const resolvers = require("./resolvers");
-
   const schema = makeExecutableSchema({
     resolvers,
     resolverValidationOptions: {
@@ -564,7 +587,7 @@ class dailyAPI {
   console.log(`GraphQL API server running at http://localhost:${port}/graphql`);
 })();
 async function loadPlayers(db, keys) {
-  const players = await playerAPI.getAllPlayers(db);
+  const players = await db.collection("players").find().toArray();
   const result = players.reduce((acc, document) => {
     acc[document._id] = document;
     return acc;
@@ -575,7 +598,7 @@ async function loadPlayers(db, keys) {
 }
 
 async function loadReviews(db, keys) {
-  const reviews = await reviewAPI.getAllReviews(db);
+  const reviews = await db.collection("reviews").find().toArray();
   const result = reviews.reduce((acc, document) => {
     acc[document._id] = document;
     return acc;
@@ -586,7 +609,7 @@ async function loadReviews(db, keys) {
 }
 
 async function loadUsers(db, keys) {
-  const users = await userAPI.getAllUsers(db);
+  const users = await db.collection("users").find().toArray();
   const result = users.reduce((acc, document) => {
     acc[document._id] = document;
     return acc;
@@ -597,11 +620,18 @@ async function loadUsers(db, keys) {
 }
 
 async function loadGames(db, keys) {
-  const games = await gameAPI.getAllGames(db);
+  const games = await db.collection("games").find().toArray();
+  let index = 0;
   const result = games.reduce((acc, document) => {
-    acc[document._id] = document;
+    // console.log(index++, typeof document, typeof document._id, typeof acc);
+    acc[document._id.toString()] = document;
     return acc;
   }, {});
+  /*   for (const key of keys) {
+    console.log(++index);
+    console.log("key is: ", key);
+    console.log("result[key] is: ", result[key]);
+  } */
   return keys.map(
     (key) => result[key] || new Error(`game [${key}] does not exist `)
   );
