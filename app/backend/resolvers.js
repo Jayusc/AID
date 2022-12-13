@@ -34,10 +34,14 @@ const resolvers = {
       return _id;
     },
     player: ({ _id }, _, context) => {
-      return context.reviewAPI.belongPlayer(context.db, _id);
+      return context.reviewAPI.belongPlayer(context.db, _id).then((pid) => {
+        return context.loaders.player.load(pid);
+      });
     },
     game: ({ _id }, _, context) => {
-      return context.reviewAPI.belongGame(context.db, _id);
+      return context.reviewAPI.belongGame(context.db, _id).then((gid) => {
+        return context.loaders.game.load(gid);
+      });
     },
     stats: ({ _id }, _, context) => {
       return context.reviewAPI.playerStats(context.db, _id);
