@@ -1,0 +1,69 @@
+type Player {
+  pid: ID!
+  recent_reviews: [Review]
+  average_rating: Float
+  fname: String
+  lname: String
+  name: String
+}
+
+type Review {
+  rid: ID!
+  player: Player
+  game: Game
+  stats: Stats
+  ratings: Float
+  comments: String
+  votes: Int
+  shadow: Boolean
+}
+
+type Game {
+  gid: ID!
+  team_Home: String
+  team_Away: String
+  outcome: Outcome
+  time: String
+  players: [Player]
+}
+
+type User {
+  uid: ID!
+  reviews: [Review]
+  follows: [Player]
+  username: String
+  password: String
+}
+
+type Stats {
+  minutes: String
+  points: Int
+  rebounds: Int
+  assists: Int
+  steals: Int
+  blocks: Int
+  turnovers: Int
+}
+
+type Outcome {
+  home: Int
+  away: Int
+}
+
+type Query {
+  player(pid: ID!): Player
+
+  review(rid: ID!): Review
+
+  reviews(limit: Int): [Review]
+
+  game(gid: ID!): Game
+
+  games(date: String, limit: Int): [Game]
+
+  user(uid: ID!): User
+}
+
+type Mutation {
+  writeReview(pid: ID!, gid: ID!, uid: ID!, new_comment: String, new_rating: Float): Review
+}
