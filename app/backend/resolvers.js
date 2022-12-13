@@ -172,6 +172,13 @@ const resolvers = {
     user: (_, { uid }, context) => {
       return context.loaders.user.load(uid);
     },
+    topReview: async (_, { pid, gid }, context) => {
+      return await context.reviewAPI
+        .getTopReview(context.db, pid, gid)
+        .then((highest_rid) => {
+          return context.reviewAPI.getReviewById(context.db, highest_rid);
+        });
+    },
   },
   Mutation: {
     writeReview: async (
@@ -195,7 +202,8 @@ const resolvers = {
           new_rating
         )
         .then((rid) => {
-          context.loaders.review.clear(rid);
+          context.loaders.review.clear(pid);
+          context.loaders.user.clear(uid);
           return context.loaders.review.load(rid);
         });
     },

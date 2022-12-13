@@ -62,6 +62,8 @@ type Query {
   games(date: String, limit: Int): [Game]
 
   user(uid: ID!): User
+
+  topReview(pid: ID!, gid: ID!): Review
 }
 
 type Mutation {
