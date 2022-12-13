@@ -14,7 +14,7 @@
                             {{o.description}}
                             <div v-for = "(p,q) in o.stats" :key = "q">
                                 <el-card>
-                                    {{p.name}} {{p.value}}
+                                    {{detailrespond[p.name]}} : {{p.value}}
                                 </el-card>
                             </div>
                         </el-card>
@@ -31,7 +31,7 @@
 
 <script>
 import axios from "axios";
-
+import {zhuanhuan} from "@/components/home/Teamstatisticscorresponding"
 export default {
     name: "TeamDetail",
     data(){
@@ -40,6 +40,7 @@ export default {
             abbrword: "",
             zhende: true,
             imgurl: "",
+            detailrespond:zhuanhuan,
         }
     },
     props: ["name",

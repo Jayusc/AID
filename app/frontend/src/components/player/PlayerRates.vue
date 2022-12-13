@@ -38,11 +38,11 @@
     </div>
 </template>
 <script>
+import gql from "graphql-tag";
+
 export default {
     components: {},
-    props: {
-        returnHome: Function
-    },
+    props: ["returnHome", "playerID", "gameID"],
     data() {
         return {
             iconClasses: ['el-icon-basketball','el-icon-basketball','el-icon-basketball'],
@@ -113,7 +113,39 @@ export default {
         resetForm() {
             this.$refs['elForm'].resetFields()
         },
+    },
+
+    apollo: {
+        // 带参数的查询
+        gid: {
+            // gql 查询
+            query: gql`query Query($date: String) {
+                games(date: $date){
+                time
+                team_Home
+                team_Away
+                gid
+                outcome{
+                home
+                away
+                }
+                }
+            }`,
+            update(data) {
+                // console.log(this.games)
+                return data.games;
+
+            },
+            // 静态参数
+            variables: {
+                // date: this.playerID,
+            },
+            // fetchPolicy: "no-cors"
+            // no-core
+        },
     }
+
+
 }
 
 </script>
