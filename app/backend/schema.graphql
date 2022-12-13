@@ -16,6 +16,7 @@ type Review {
   comments: String
   votes: Int
   shadow: Boolean
+  highest_vote: ID
 }
 
 type Game {
@@ -62,6 +63,8 @@ type Query {
   games(date: String, limit: Int): [Game]
 
   user(uid: ID!): User
+
+  topReview(pid: ID!, gid: ID!): Review
 }
 
 type Mutation {

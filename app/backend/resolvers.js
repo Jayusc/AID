@@ -54,6 +54,9 @@ const resolvers = {
     shadow: ({ _id }, _, context) => {
       return context.reviewAPI.isShadow(context.db, _id);
     },
+    highest_vote: ({ _id }, _, context) => {
+      return context.reviewAPI.getHighestVote(context.db, _id);
+    }
   },
   Game: {
     gid: ({ _id }, _, context) => {
@@ -168,6 +171,13 @@ const resolvers = {
     user: (_, { uid }, context) => {
       return context.loaders.user.load(uid);
     },
+    topReview: async (_, {pid, gid}, context) => {
+      return await context.reviewAPI
+        .getTopReview(context.db, pid, gid)
+        .then((highest_rid) => {
+          return context.reviewAPI.getReviewById(context.db, highest_rid);
+        })
+    }
   },
   Mutation: {
     writeReview: async (_, {pid, gid, uid, new_comment, new_rating}, context) => {
