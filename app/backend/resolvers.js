@@ -225,7 +225,12 @@ const resolvers = {
         });
     },
     changePassword: async (_, { uid, new_password }, context) => {
-      return context.userAPI.changePwd(context.db, uid, new_password);
+      return context.userAPI
+        .changePwd(context.db, uid, new_password)
+        .then((uid) => {
+          context.loaders.user.clear(uid);
+          return uid;
+        });
     },
     upVote: async (_, { rid }, context) => {
       return context.reviewAPI.upVote(context.db, rid);
