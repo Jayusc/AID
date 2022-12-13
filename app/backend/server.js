@@ -301,6 +301,13 @@ class gameAPI {
       .map((p) => p._id)
       .toArray();
   }
+  static async getGamebyDate(db, date) {
+    return await db
+      .collection("games")
+      .find({ time: date })
+      .map((p) => p._id)
+      .toArray();
+  }
   static async getHome(db, gid) {
     return await gameAPI.getGameById(db, gid).then((game) => {
       return game ? game.team_home : null;

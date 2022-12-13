@@ -151,17 +151,19 @@ const resolvers = {
     game: (_, { gid }, context) => {
       return context.loaders.game.load(gid);
     },
-    games: async (_, { limit = 20 }, context) => {
-      return await context.gameAPI
-        .getAllGames(context.db)
-        .then((idList) => {
-          return idList
-            ? idList.map((id) => context.loaders.game.load(id))
-            : null;
+    games: async (_, { date, limit = 20 }, context) => {
+      let idList = [];
+      idList = date
+        ? await context.gameAPI.getGamebyDate(context.db, date)
+        : await context.gameAPI.getAllGames(context.db);
+      return await Promise.all([idList])
+        .then((promiseList) => {
+          const gidList = promiseList[0];
+          return gidList
+            .map((id) => context.loaders.game.load(id))
+            .slice(0, limit);
         })
-        .then((gameList) => {
-          return gameList ? gameList.slice(0, limit) : null;
-        });
+        .catch((err) => console.log(err));
     },
     user: (_, { uid }, context) => {
       return context.loaders.user.load(uid);

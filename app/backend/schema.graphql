@@ -59,7 +59,7 @@ type Query {
 
   game(gid: ID!): Game
 
-  games(date: String): [Game]
+  games(date: String, limit: Int): [Game]
 
   user(uid: ID!): User
 }
