@@ -65,6 +65,8 @@ type Query {
   user(uid: ID!): User
 
   topReview(pid: ID!, gid: ID!): Review
+
+  getAverageRating(pid: ID!): Float
 }
 
 type Mutation {

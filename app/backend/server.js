@@ -125,6 +125,22 @@ class playerAPI {
       return player ? player.recent_revs : null;
     });
   }
+
+  static async calculateAverageRating(db, pid) {
+    return await db
+      .collection("reviews")
+      .find({player: pid})
+      .aggregate(
+        [{
+          $group: {
+            _id: null,
+            ave_rating: {
+              $avg: "$rating"
+            }
+          }
+        }]
+      ).ave_rating
+  }
 }
 
 class reviewAPI {

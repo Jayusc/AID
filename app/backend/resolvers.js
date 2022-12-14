@@ -177,7 +177,10 @@ const resolvers = {
         .then((highest_rid) => {
           return context.reviewAPI.getReviewById(context.db, highest_rid);
         })
-    }
+    },
+    getAverageRating: async (_, {pid}, context) => {
+      return await context.playerAPI.calculateAverageRating(context.db, pid)
+    },
   },
   Mutation: {
     writeReview: async (_, {pid, gid, uid, new_comment, new_rating}, context) => {
