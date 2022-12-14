@@ -8,19 +8,19 @@
                          void-icon-class="el-icon-basketball"
                          allow-half show-score></el-rate>
             </el-form-item>
-            <el-form-item label-width="132px" label="Ability 1" prop="field104">
+            <el-form-item label-width="132px" label="Scoring Abilities" prop="field104">
                 <el-rate v-model="formData.field104"
                          :icon-classes="iconClasses"
                          void-icon-class="el-icon-basketball"
                          allow-half show-score></el-rate>
             </el-form-item>
-            <el-form-item label-width="132px" label="Ability 2" prop="field105">
+            <el-form-item label-width="132px" label="Support Abilities" prop="field105">
                 <el-rate v-model="formData.field105"
                          :icon-classes="iconClasses"
                          void-icon-class="el-icon-basketball"
                          allow-half show-score></el-rate>
             </el-form-item>
-            <el-form-item label-width="132px" label="Ability 3" prop="field106">
+            <el-form-item label-width="132px" label="Critical Abilities" prop="field106">
                 <el-rate v-model="formData.field106"
                          :icon-classes="iconClasses"
                          void-icon-class="el-icon-basketball"
