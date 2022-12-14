@@ -157,12 +157,16 @@ class reviewAPI {
       .toArray();
   }
   static async belongPlayer(db, rid) {
+    // return the review's player ID
+
     return await reviewAPI.getReviewById(db, rid).then((review) => {
+      // console.log("belongPlayer:", review);
       return review ? review.player : null;
     });
   }
   static async belongGame(db, rid) {
     return await reviewAPI.getReviewById(db, rid).then((review) => {
+      // console.log("belongGame:", review);
       return review ? review.game : null;
     });
   }
@@ -173,12 +177,12 @@ class reviewAPI {
   }
   static async getRating(db, rid) {
     return await reviewAPI.getReviewById(db, rid).then((review) => {
-      return review ? review.rating : null;
+      return review ? review.ratings : null;
     });
   }
   static async getComment(db, rid) {
     return await reviewAPI.getReviewById(db, rid).then((review) => {
-      return review ? review.comment : null;
+      return review ? review.comments : null;
     });
   }
   static async getVotes(db, rid) {
@@ -226,42 +230,33 @@ class reviewAPI {
     });
   }
   static async updateHighestVote(db, rid) {
-    // if the new votes from the new review is higher
-    // than the votes from the highest review stored in the shadow review
+    // always monitoring the hightest review and write to shadow
     // replace with the new review id
     const reviews = db.collection("reviews");
-    const pid = await reviewAPI.belongPlayer(db, rid).then((player) => {
-      return player.pid;
-    });
-    const gid = await reviewAPI.belongGame(db, rid).then((game) => {
-      return game.gid;
-    });
+    const pid = await reviewAPI.belongPlayer(db, rid);
+    const gid = await reviewAPI.belongGame(db, rid);
     const shadow_rid = await reviewAPI.getShadow(db, pid, gid);
-    const vote_rank = await db
-      .collection("reviews")
+    if (!shadow_rid) return null;
+    const vote_rank = await reviews
       .find({
         shadow: false,
-        player: ObjectId(pid),
-        game: ObjectId(gid),
+        player: pid,
+        game: gid,
       })
       .sort({ votes: -1 }) // sort in descending order
       .toArray();
-    console.log(vote_rank);
-    const best_review = context.loader.review.load(vote_rank[0]);
-    console.log(best_review);
     reviews.updateOne(
       {
         _id: shadow_rid,
       },
       {
         $set: {
-          ratings: best_review.ratings,
-          comments: best_review.comments,
-          votes: best_review.votes,
+          ratings: vote_rank[0].ratings,
+          comments: vote_rank[0].comments,
+          votes: vote_rank[0].votes,
         },
       }
     );
-    context.loader.review.clear(shadow_rid);
     return shadow_rid;
   }
 
@@ -271,12 +266,13 @@ class reviewAPI {
     });
   }
   static async getShadow(db, pid, gid) {
+    // Get shadow review, return rid
+    // If pid and gid don't match, return null
     return db
       .collection("reviews")
       .findOne({ player: ObjectId(pid), game: ObjectId(gid) })
       .then((doc) => {
-        console.log(doc);
-        return doc._id;
+        return doc ? doc._id : null;
       });
   }
 
@@ -312,7 +308,8 @@ class reviewAPI {
   ) {
     // create a new review with new rating and comments. return review ID
     const reviews = db.collection("reviews");
-    const playerstats = reviewAPI.playerStats(db, shadow_review_id);
+    const playerstats = await reviewAPI.playerStats(db, shadow_review_id);
+    console.log(playerstats);
     return await reviews
       .insertOne({
         _id: ObjectId(),

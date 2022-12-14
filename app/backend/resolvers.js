@@ -191,6 +191,7 @@ const resolvers = {
         pid,
         gid
       );
+      if (!shadow_review_id) return null;
       return context.reviewAPI
         .newReview(
           context.db,
